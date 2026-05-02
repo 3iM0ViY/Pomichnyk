@@ -1,0 +1,278 @@
+@import url('https://fonts.googleapis.com/css2?family=Victor+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+/* ===================================
+	0. Clear CSS
+====================================== */
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+	margin:0;
+	padding:0;
+	border:0;
+	outline: none;
+	vertical-align:baseline;
+	background:transparent;
+	scroll-behavior: smooth;
+	text-wrap: pretty;
+}
+html{
+	overflow-x: hidden;
+	font-size: 16px;
+}
+body {
+	line-height:1;
+	background-color: #0a0615;
+/*	background-image:
+		repeating-linear-gradient(
+			to right, transparent 0 100px,
+			#babaca 100px 101px
+		);*/
+	max-height: 100vh;
+}
+article,aside,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section { 
+	display:block;
+}
+nav ul,ul,ol {
+	list-style:none;
+}
+blockquote, q {
+	quotes:none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content:'';
+	content:none;
+}
+a {
+	margin:0;
+	padding:0;
+	font-size:100%;
+	outline: none;
+	vertical-align:baseline;
+	background:transparent;
+	text-decoration: none;
+}
+ins {
+	background-color:#ff9;
+	color:#000;
+	text-decoration:none;
+}
+mark {
+	background-color:#ff9;
+	color:#000; 
+	font-style:italic;
+	font-weight:bold;
+}
+del {
+	text-decoration: line-through;
+}
+abbr[title], dfn[title] {
+	border-bottom:1px dotted;
+	cursor:help;
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+}
+hr {
+	display:block;
+	height:1px;
+	border:0;   
+	border-top:1px solid #cccccc;
+	margin:1em 0;
+	padding:0;
+}
+input, select {
+	vertical-align:middle;
+}
+input:focus, textarea:focus
+{
+	outline: none;
+}
+
+/* ===================================
+	1. Base Styles
+====================================== */
+
+/* Base */
+body {
+	font-family: "Victor Mono", monospace;
+	font-optical-sizing: auto;
+	font-style: normal;
+	background-color: #0f172a;
+	color: #e2e8f0;
+	line-height: 1.6;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: -1;
+}
+code{
+	display: block;
+	width: fit-content;
+	padding: 10px;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.25);
+	margin: 5px 0;
+}
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 1.6rem;
+    margin: 1.5rem 0 0.5rem;
+    color: #38bdf8;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    color: #94a3b8;
+}
+
+p {
+    margin-bottom: 1rem;
+    max-width: 70ch;
+}
+
+/* Layout */
+.container {
+	width: 90%;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+/* Navbar */
+.navbar {
+	background: rgba(15, 23, 42, 0.9);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+}
+
+.nav-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.75rem 0;
+}
+
+.logo a {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #38bdf8;
+	text-decoration: none;
+}
+
+/* Navigation */
+.nav-links {
+	list-style: none;
+	display: flex;
+	gap: 1.5rem;
+}
+
+.nav-links a {
+	text-decoration: none;
+	color: #cbd5f5;
+	transition: color 0.2s ease;
+	font-size: 1.4rem;
+}
+
+.nav-links a:hover {
+	color: #38bdf8;
+}
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 1px;
+    background: #38bdf8;
+    transition: width 0.2s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* Main */
+.main-content {
+	padding: 2rem 0;
+	min-height: 80vh;
+}
+
+/* Cards (reusable component) */
+.card {
+    background: linear-gradient(145deg, #1e293b, #172033);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.circular_list{
+	list-style: circle;
+	padding-left: 20px;
+}
+/* Buttons */
+.btn {
+	display: inline-block;
+	padding: 0.6rem 1.2rem;
+	border-radius: 10px;
+	background: #38bdf8;
+	color: #0f172a;
+	font-weight: 500;
+	text-decoration: none;
+	transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+}
+
+/* Footer */
+.footer {
+	border-top: 1px solid rgba(255, 255, 255, 0.05);
+	text-align: center;
+	padding: 1rem 0;
+	color: #94a3b8;
+	font-size: 0.9rem;
+	background: rgba(15, 23, 42, 0.9);
+	backdrop-filter: blur(12px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.nav-links {
+		gap: 1rem;
+	}
+
+	.logo a {
+		font-size: 1.2rem;
+	}
+}
+

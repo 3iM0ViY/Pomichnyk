@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{% block title %}Pomichnyk{% endblock %}</title>
+	<link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+	<link rel="stylesheet" href="{% static 'css/css.css' %}">
+</head>
+<body>
+
+	<header class="navbar">
+		<div class="container nav-content">
+			<div class="logo">
+				<a href="/">Pomichnyk</a>
+			</div>
+
+			<nav>
+				<ul class="nav-links">
+					<li><a href="#">Мапи</a></li>
+					<li><a href="#">Філософія</a></li>
+					<li><a href="#">Адмінка</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<main class="container main-content">
+		{% block content %}
+		<h1>Hello, world!</h1>
+
+		<div>
+			<div class="card">
+				<h1>Pomichnyk</h1>
+				<p>Pomichnyk — це веб-додаток, де ми збираємо й ділимось всім корисним для себе в Counter-Strike 2: коллаути, стратки, лайнапи.</p>
+				<h2>(dev)</h2>
+				<pre><code class="language-bash">cd C:\Users\yul\Documents\Юлік\Програмування\Pomichnyk
+.\venv\Scripts\activate</code></pre>
+				<pre><code class="language-bash">python manage.py runserver</code></pre>
+				<pre><code class="language-bash"># Create a requirements file that contain all your projet dependencies
+pip freeze &gt; requirements.txt
+
+# Install your project requirements (if a requirements file exist) 
+pip install -r requirements.txt</code></pre>
+			</div>
+			<div class="card">
+				<h2>Що є / планується</h2>
+				<h3>Мапи</h3>
+				<ul class="circular_list">
+					<li>Ілюстрації з підписаними коллаутами</li>
+					<li>Зручний перегляд з телефону і ПК</li>
+				</ul>
+				<h3>Стратбук</h3>
+				<ul class="circular_list">
+					<li>Готові тактики</li>
+					<li>Розбиття по мапах / ролях</li>
+					<li>Додавання нових стратегій</li>
+				</ul>
+				<h3>Лайнапи</h3>
+				<ul class="circular_list">
+					<li>Смоки, флешки, молотови</li>
+					<li>Збереження позицій і точок наведення</li>
+					<li>Візуальні підказки</li>
+				</ul>
+				<h3>Спільна база знань</h3>
+				<ul class="circular_list">
+					<li>Додаємо все самі</li>
+					<li>Кожен може бути “контент-кріейтором”</li>
+				</ul>
+			</div>
+			<div class="card">
+				<h2>🛠️ Roadmap</h2>
+				<ul>
+					<li><input disabled="" type="checkbox"> Базові моделі (Map, Strategy, Lineup)</li>
+					<li><input disabled="" type="checkbox"> Адмінка для швидкого наповнення</li>
+					<li><input disabled="" type="checkbox"> UI для перегляду мап</li>
+					<li><input disabled="" type="checkbox"> Мобільна адаптація</li>
+					<li><input disabled="" type="checkbox"> Пошук і фільтри</li>
+				</ul>
+			</div>
+			<blockquote>
+				<h3>Yabbadabbadoo ▄︻デ══━一✨</h3>
+			</blockquote>
+
+		</div>
+		{% endblock %}
+	</main>
+
+	<footer class="footer">
+		<div class="container">
+			<p>© {{ now|date:"Y" }} Pomichnyk. All rights reserved.</p>
+		</div>
+	</footer>
+
+</body>
+</html>
