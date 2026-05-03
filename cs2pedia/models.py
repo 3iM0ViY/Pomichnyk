@@ -12,7 +12,7 @@ class Map(models.Model):
 	keywords = models.CharField(verbose_name="Ключові слова", max_length=250, blank=True, null=True)
 
 	image = models.ImageField(verbose_name='Мапа', upload_to="cs2pedia/maps/")
-	photo_minified = models.ImageField(verbose_name='Стиснута мапа', upload_to="cs2pedia/maps/mini/", null=True, blank=True)
+	img_mini = models.ImageField(verbose_name='Стиснута мапа', upload_to="cs2pedia/maps/mini/", null=True, blank=True)
 	alt_text = models.CharField(verbose_name="Підпис", max_length=250, null=True, blank=True)
 
 	views = models.PositiveIntegerField(default=0, verbose_name="Кількість переглядів")
@@ -27,7 +27,7 @@ class Map(models.Model):
 	class Meta:
 		verbose_name = 'Мапа'
 		verbose_name_plural = 'Мапи'
-		ordering = ['name']
+		ordering = ["-is_published", "-is_in_pool", 'name']
 
 	def get_absolute_url(self):
 		return reverse('pomichnyk_core:map_detail', args=[self.slug,])
