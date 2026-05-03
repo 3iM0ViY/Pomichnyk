@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>{% block title %}Pomichnyk{% endblock %}</title>
+	<title>Pomichnyk :: {% block title %}Головна{% endblock %}</title>
 	<link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 	<link rel="stylesheet" href="{% static 'css/css.css' %}">
 </head>
@@ -13,10 +13,16 @@
 	<header class="navbar">
 		<div class="container nav-content">
 			<div class="logo">
-				<a href="/">Pomichnyk</a>
+				<a href="/" class="logo-text" data-text="Pomichnyk">Pomichnyk</a>
 			</div>
 
-			<nav>
+			<button class="nav-toggle" aria-label="Toggle navigation">
+				<span></span>
+				<span></span>
+				<span></span>
+			</button>
+
+			<nav class="nav-menu">
 				<ul class="nav-links">
 					<li><a href="#">Мапи</a></li>
 					<li><a href="#">Філософія</a></li>
@@ -28,61 +34,37 @@
 
 	<main class="container main-content">
 		{% block content %}
-		<h1>Hello, world!</h1>
+		<div class="dashboard">
 
-		<div>
-			<div class="card">
-				<h1>Pomichnyk</h1>
-				<p>Pomichnyk — це веб-додаток, де ми збираємо й ділимось всім корисним для себе в Counter-Strike 2: коллаути, стратки, лайнапи.</p>
-				<h2>(dev)</h2>
-				<pre><code class="language-bash">cd C:\Users\yul\Documents\Юлік\Програмування\Pomichnyk
-.\venv\Scripts\activate</code></pre>
-				<pre><code class="language-bash">python manage.py runserver</code></pre>
-				<pre><code class="language-bash"># Create a requirements file that contain all your projet dependencies
-pip freeze &gt; requirements.txt
+			<a href="/tutorial/" class="dash-card dash-tutorial">
+				<div class="dash-bg" style="background-image: url('{% static "static_img/tutorial.png" %}')"></div>
+				<div class="dash-content">
+					<h2>Туторіал</h2>
+					<p>Прочитайте перед використанням</p>
+				</div>
+			</a>
 
-# Install your project requirements (if a requirements file exist) 
-pip install -r requirements.txt</code></pre>
-			</div>
-			<div class="card">
-				<h2>Що є / планується</h2>
-				<h3>Мапи</h3>
-				<ul class="circular_list">
-					<li>Ілюстрації з підписаними коллаутами</li>
-					<li>Зручний перегляд з телефону і ПК</li>
-				</ul>
-				<h3>Стратбук</h3>
-				<ul class="circular_list">
-					<li>Готові тактики</li>
-					<li>Розбиття по мапах / ролях</li>
-					<li>Додавання нових стратегій</li>
-				</ul>
-				<h3>Лайнапи</h3>
-				<ul class="circular_list">
-					<li>Смоки, флешки, молотови</li>
-					<li>Збереження позицій і точок наведення</li>
-					<li>Візуальні підказки</li>
-				</ul>
-				<h3>Спільна база знань</h3>
-				<ul class="circular_list">
-					<li>Додаємо все самі</li>
-					<li>Кожен може бути “контент-кріейтором”</li>
-				</ul>
-			</div>
-			<div class="card">
-				<h2>🛠️ Roadmap</h2>
-				<ul>
-					<li><input disabled="" type="checkbox"> Базові моделі (Map, Strategy, Lineup)</li>
-					<li><input disabled="" type="checkbox"> Адмінка для швидкого наповнення</li>
-					<li><input disabled="" type="checkbox"> UI для перегляду мап</li>
-					<li><input disabled="" type="checkbox"> Мобільна адаптація</li>
-					<li><input disabled="" type="checkbox"> Пошук і фільтри</li>
-				</ul>
-			</div>
+			<a href="/maps/" class="dash-card dash-maps">
+				<div class="dash-bg" style="background-image: url('{% static "static_img/lobby_mapveto_png.png" %}')"></div>
+				<div class="dash-content">
+					<h2>Мапи</h2>
+					<p>Позиції, страти та розкидка</p>
+				</div>
+			</a>
+
+			<a href="/admin/" class="dash-card dash-admin">
+				<div class="dash-bg" style="background-image: url('{% static "static_img/csgo_polizei.png" %}')"></div>
+				<div class="dash-content">
+					<h2>Адмінка</h2>
+					<p>Вхід в акаунт та контрибуція</p>
+				</div>
+			</a>
+
+		</div>
+		<div class="lower-main">
 			<blockquote>
 				<h3>Yabbadabbadoo ▄︻デ══━一✨</h3>
 			</blockquote>
-
 		</div>
 		{% endblock %}
 	</main>
@@ -92,6 +74,14 @@ pip install -r requirements.txt</code></pre>
 			<p>© {{ now|date:"Y" }} Pomichnyk. All rights reserved.</p>
 		</div>
 	</footer>
+<script>
+	const toggle = document.querySelector(".nav-toggle");
+	const menu = document.querySelector(".nav-menu");
 
+	toggle.addEventListener("click", () => {
+		menu.classList.toggle("active");
+		toggle.classList.toggle("active");
+	});
+</script>
 </body>
 </html>
