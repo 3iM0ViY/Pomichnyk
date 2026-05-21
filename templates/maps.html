@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="maps-page">
+	<div class="maps-grid">
+		<!-- Active pool -->
+		<div class="maps-main">
+			<h2>Active Pool</h2>
+
+			<div class="cards-grid">
+				{% for map in pool_maps %}
+					<a href="{{ map.get_absolute_url }}" class="dash-card map-card">
+						<div class="dash-bg" style="background-image: url('{{ map.img_mini.url|default:map.image.url }}')"></div>
+						<div class="dash-content">
+							<h3>{{ map.name }}</h3>
+							{% if map.meta %}
+								<p>{{ map.meta }}</p>
+							{% endif %}
+						</div>
+					</a>
+				{% endfor %}
+			</div>
+		</div>
+
+		<!-- Archived / not in pool -->
+		<aside class="maps-side">
+			<h2>Removed</h2>
+			<div class="cards-grid side-grid">
+				{% for map in other_maps %}
+					<a href="{{ map.get_absolute_url }}" class="dash-card map-card">
+						<div class="dash-bg" style="background-image: url('{{ map.img_mini.url|default:map.image.url }}')"></div>
+						<div class="dash-content">
+							<h3>{{ map.name }}</h3>
+							{% if map.meta %}
+								<p>{{ map.meta }}</p>
+							{% endif %}
+						</div>
+					</a>
+				{% endfor %}
+			</div>
+		</aside>
+	</div>
+</section>
+{% endblock %}

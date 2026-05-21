@@ -24,7 +24,7 @@
 
 			<nav class="nav-menu">
 				<ul class="nav-links">
-					<li><a href="#">Мапи</a></li>
+					<li><a href="{% url 'pomichnyk_core:maps' %}">Мапи</a></li>
 					<li><a href="#">Філософія</a></li>
 					<li><a href="#">Адмінка</a></li>
 				</ul>
@@ -44,11 +44,11 @@
 				</div>
 			</a>
 
-			<a href="/maps/" class="dash-card dash-maps">
+			<a href="{% url 'pomichnyk_core:maps' %}" class="dash-card dash-maps">
 				<div class="dash-bg" style="background-image: url('{% static "static_img/lobby_mapveto_png.png" %}')"></div>
 				<div class="dash-content">
 					<h2>Мапи</h2>
-					<p>Позиції, страти та розкидка</p>
+					<p>Позиції, страти та розкидки</p>
 				</div>
 			</a>
 
