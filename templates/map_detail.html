@@ -1,1 +1,337 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ map.name }}{% endblock %}
+
+{% block content %}
+<main class="container map-detail">
+	<section class="map-hero">
+		<div class="map-title-block">
+			<h1 class="map-title">{{ map.name }}</h1>
+			<div class="map-badges">
+				{% if map.is_in_pool %}
+					<span class="badge badge-active">В ротації</span>
+				{% else %}
+					<span class="badge badge-removed">На кладовищі історії</span>
+				{% endif %}
+				<span class="badge badge-views">
+					{{ map.views }} переглядів
+				</span>
+			</div>
+		</div>
+	</section>
+
+	<section class="map-hero-grid">
+		<div class="map-preview">
+			<img src="{{ map.image.url }}" alt="{{ map.name }}">
+		</div>
+
+		<aside class="map-strategies">
+			<h2>Страти</h2>
+			<div class="strategy-list">
+				{% for strat in strategies %}
+					{% if strat.is_active %}
+						<a href="#" class="strategy-card">
+							<div class="strategy-top">
+								<span class="strategy-name">{{ strat.name }}</span>
+								<span class="strategy-side">
+									{% if strat.side == "T" %}
+										<img src="{% static 'static_img/icons/t_logo.svg' %}" alt="T side">
+									{% else %}
+										<img src="{% static 'static_img/icons/ct_logo.svg' %}" alt="CT side">
+									{% endif %}
+								</span>
+
+							</div>
+
+							<div class="strategy-meta">
+								<span>{{ strat.likes }} вподобайок</span>
+								{% if strat.is_active %}
+									<span class="dot active"></span> активна
+								{% else %}
+									<span class="dot inactive"></span> архівовано
+								{% endif %}
+							</div>
+
+							<div class="strategy-author">
+								автор: {{ strat.created_by }}
+							</div>
+						</a>
+					{% endif %}
+				{% empty %}
+					<p class="muted">Напишіть першу стратку.</p>
+				{% endfor %}
+			</div>
+			{% if strategies|length >= 10 %}
+				<button class="btn btn-small">Переглянути всі</button>
+			{% endif %}
+		</aside>
+	</section>
+
+	<section class="lineups-section">
+		<h2>Лайнапи гранат</h2>
+		<div class="lineups-grid">
+			{% for lineup in lineups %}
+				<article class="lineup-card lineup-{{ lineup.utility }}">
+					<div class="lineup-media lineup-expand-trigger">
+						<div class="lineup-slider">
+							<div class="lineup-track">
+								{% for img in lineup.slide.all %}
+									<div class="lineup-slide">
+										<img src="{{ img.img.url }}" alt="{{ lineup.title }}">
+									</div>
+								{% empty %}
+									<div class="placeholder">
+										Нема картінок
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+						{% if lineup.slide.all|length > 1 %}
+							<button class="slider-btn slider-prev" type="button" aria-label="Попереднє зображення">
+								<img src="{% static 'static_img/icons/double_arrows.svg' %}" alt="">
+							</button>
+							<button class="slider-btn slider-next" type="button" aria-label="Наступне зображення">
+								<img src="{% static 'static_img/icons/double_arrows.svg' %}" alt="">
+							</button>
+						{% endif %}
+					</div>
+
+					<div class="lineup-retake-ribbon">
+						<span>{{ lineup.title }}</span>
+					</div>
+
+					<div class="lineup-info">
+						<div class="lineup-heading">
+							<h3 class="lineup-expand-trigger">{{ lineup.title }}</h3>
+							<div class="utility-icon">
+								{% if lineup.utility == "smoke" %}
+									<img src="{% static 'static_img/icons/smokegrenade.svg' %}" alt="Smoke">
+								{% elif lineup.utility == "molotov" %}
+									<img src="{% static 'static_img/icons/molotov.svg' %}" alt="Molotov">
+								{% elif lineup.utility == "flash" %}
+									<img src="{% static 'static_img/icons/flashbang.svg' %}" alt="Flashbang">
+								{% elif lineup.utility == "he" %}
+									<img src="{% static 'static_img/icons/hegrenade.svg' %}" alt="HE Grenade">
+								{% elif lineup.utility == "decoy" %}
+									<img src="{% static 'static_img/icons/decoy.svg' %}" alt="Decoy">
+								{% endif %}
+							</div>
+						</div>
+
+						<p class="muted">{{ lineup.description }}</p>
+						{% if lineup.comment %}
+							<p class="muted comment">{{ lineup.comment }}</p>
+						{% endif %}
+						<div class="lineup-meta">
+							<span>Звідки: {{ lineup.throw_from }}</span>
+							<span>Куди: {{ lineup.land_at }}</span>
+						</div>
+						{% if lineup.video_url %}
+							<a href="{{ lineup.get_embed_url }}" target="_blank">
+								Відео
+							</a>
+						{% endif %}
+						<div class="lineup-footer">
+							<div class="lineup-votes" data-vote-url="{% url 'home:lineup_vote' lineup.pk %}">
+								<button class="vote-btn vote-down" type="button" data-vote="down">
+									<img src="{% static 'static_img/icons/chatwheel_negative.svg' %}" alt="Мінус">
+								</button>
+
+								<span class="likes-count">{{ lineup.likes }}</span>
+
+								<button class="vote-btn vote-up" type="button" data-vote="up">
+									<img src="{% static 'static_img/icons/chatwheel_affirmative.svg' %}" alt="Плюс">
+								</button>
+							</div>
+
+							<span>автор: {{ lineup.created_by }}</span>
+						</div>
+					</div>
+				</article>
+			{% endfor %}
+		</div>
+	</section>
+
+	<div class="lineup-modal" id="lineupModal" aria-hidden="true">
+		<div class="lineup-modal-backdrop"></div>
+
+		<div class="lineup-modal-content">
+			<button class="lineup-modal-close" type="button" aria-label="Закрити">
+				×
+			</button>
+
+			<div class="lineup-modal-inner"></div>
+		</div>
+	</div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	function initLineupSlider(slider) {
+		const track = slider.querySelector(".lineup-track");
+		if (!track) return;
+		const slides = slider.querySelectorAll(".lineup-slide");
+		const prevBtn = slider.querySelector(".slider-prev");
+		const nextBtn = slider.querySelector(".slider-next");
+
+		let index = 0;
+		const maxIndex = slides.length - 1;
+
+		function updateSlider() {
+			track.style.transform = `translateX(-${index * 100}%)`;
+			if (prevBtn) {
+				prevBtn.classList.toggle("disabled", index === 0);
+			}
+			if (nextBtn) {
+				nextBtn.classList.toggle("disabled", index === maxIndex);
+			}
+		}
+
+		if (nextBtn) {
+			nextBtn.addEventListener("click", event => {
+				event.stopPropagation();
+				if (index < maxIndex) {
+					index++;
+					updateSlider();
+				}
+			});
+		}
+		if (prevBtn) {
+			prevBtn.addEventListener("click", event => {
+				event.stopPropagation();
+				if (index > 0) {
+					index--;
+					updateSlider();
+				}
+			});
+		}
+
+		updateSlider();
+	}
+
+	document.querySelectorAll(".lineup-media").forEach(initLineupSlider);
+
+	/* =========================
+		LINEUP FULLSCREEN
+	========================= */
+	const lineupModal = document.querySelector("#lineupModal");
+	const lineupModalInner = lineupModal?.querySelector(".lineup-modal-inner");
+	const lineupModalClose = lineupModal?.querySelector(".lineup-modal-close");
+	const lineupModalBackdrop = lineupModal?.querySelector(".lineup-modal-backdrop");
+	let lineupScrollPosition = 0; // returning to the same spot
+
+	function openLineupModal(card) {
+		if (!lineupModal || !lineupModalInner) return;
+
+		lineupScrollPosition = window.scrollY;
+
+		const clone = card.cloneNode(true);
+
+		lineupModalInner.innerHTML = "";
+		lineupModalInner.appendChild(clone);
+
+		lineupModal.classList.add("active");
+		lineupModal.setAttribute("aria-hidden", "false");
+		document.body.classList.add("modal-open");
+
+		clone.querySelectorAll(".lineup-media").forEach(initLineupSlider);
+	}
+
+	function closeLineupModal() {
+		if (!lineupModal || !lineupModalInner) return;
+
+		lineupModal.classList.remove("active");
+		lineupModal.setAttribute("aria-hidden", "true");
+		document.body.classList.remove("modal-open");
+
+		lineupModalInner.innerHTML = "";
+
+		window.scrollTo({
+			top: lineupScrollPosition,
+			behavior: "instant"
+		});
+	}
+
+	document.querySelectorAll(".lineup-card").forEach(card => {
+		const triggers = card.querySelectorAll(".lineup-expand-trigger");
+		triggers.forEach(trigger => {
+			trigger.addEventListener("click", event => {
+				event.preventDefault();
+				event.stopPropagation();
+
+				openLineupModal(card);
+			});
+		});
+	});
+
+	lineupModalClose?.addEventListener("click", closeLineupModal);
+	lineupModalBackdrop?.addEventListener("click", closeLineupModal);
+
+	document.addEventListener("keydown", event => {
+		if (event.key === "Escape") {
+			closeLineupModal();
+		}
+	});
+</script>
+<script>
+function getCookie(name) {
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) {
+		return parts.pop().split(";").shift();
+	}
+}
+
+document.querySelectorAll(".lineup-votes").forEach(voteBox => {
+	const url = voteBox.dataset.voteUrl;
+	const count = voteBox.querySelector(".likes-count");
+	const buttons = voteBox.querySelectorAll(".vote-btn");
+	buttons.forEach(button => {
+		button.addEventListener("click", async event => {
+			event.preventDefault();
+			event.stopPropagation();
+
+			const formData = new FormData();
+			formData.append("vote", button.dataset.vote);
+
+			const response = await fetch(url, {
+				method: "POST",
+				headers: {
+					"X-CSRFToken": getCookie("csrftoken"),
+				},
+				body: formData,
+			});
+
+			if (!response.ok) return;
+
+			const data = await response.json();
+
+			count.textContent = data.likes;
+
+			count.classList.remove(
+				"bump-positive",
+				"bump-negative"
+			);
+			void count.offsetWidth;
+			if (data.user_vote === -1) {
+				count.classList.add("bump-negative");
+			}
+			else {
+				count.classList.add("bump-positive");
+			}
+
+			buttons.forEach(btn => btn.classList.remove("active"));
+
+			if (data.user_vote === 1) {
+				voteBox.querySelector(".vote-up").classList.add("active");
+			}
+			if (data.user_vote === -1) {
+				voteBox.querySelector(".vote-down").classList.add("active");
+			}
+		});
+	});
+});
+</script>
+{% endblock %}

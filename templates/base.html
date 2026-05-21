@@ -13,7 +13,7 @@
 	<header class="navbar">
 		<div class="container nav-content">
 			<div class="logo">
-				<a href="/" class="logo-text" data-text="Pomichnyk">Pomichnyk</a>
+				<a href="{% url 'pomichnyk_core:home' %}" class="logo-text" data-text="Pomichnyk">Pomichnyk</a>
 			</div>
 
 			<button class="nav-toggle" aria-label="Toggle navigation">
@@ -74,6 +74,7 @@
 			<p>© {{ now|date:"Y" }} Pomichnyk. All rights reserved.</p>
 		</div>
 	</footer>
+
 <script>
 	const toggle = document.querySelector(".nav-toggle");
 	const menu = document.querySelector(".nav-menu");
@@ -83,5 +84,7 @@
 		toggle.classList.toggle("active");
 	});
 </script>
+{% block scripts %}
+{% endblock %}
 </body>
 </html>

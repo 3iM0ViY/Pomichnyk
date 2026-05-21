@@ -3,6 +3,10 @@ from .models import *
 from django.views.generic import ListView, DetailView
 from django.db.models import F
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+
 # Create your views here.
 def index(request):
 	return render(request, "base.html")
@@ -18,13 +22,7 @@ class MapsListView(ListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
-		context["other_maps"] = (
-			Map.objects
-			.filter(
-				is_published=True,
-				is_in_pool=False
-			)
-		)
+		context["other_maps"] = (Map.objects.filter(is_published=True, is_in_pool=False))
 
 		return context
 
@@ -36,10 +34,7 @@ class MapDetailView(DetailView):
 	slug_url_kwarg = "slug"
 
 	def get_queryset(self):
-		return (
-			Map.objects
-			.filter(is_published=True)
-		)
+		return (Map.objects.filter(is_published=True))
 
 	def get_object(self, queryset=None):
 		obj = super().get_object(queryset)
@@ -48,7 +43,6 @@ class MapDetailView(DetailView):
 		Map.objects.filter(pk=obj.pk).update(
 			views=F("views") + 1
 		)
-
 		obj.refresh_from_db(fields=["views"])
 
 		return obj
@@ -56,14 +50,52 @@ class MapDetailView(DetailView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
-		context["related_maps"] = (
-			Map.objects
-			.filter(
-				is_published=True,
-				is_in_pool=self.object.is_in_pool
-			)
-			.exclude(pk=self.object.pk)
-			[:4]
-		)
+		related_maps = Map.objects.filter(is_published=True, is_in_pool=self.object.is_in_pool).exclude(pk=self.object.pk)[:4]
+		strategies = Strategy.objects.filter(mapa=self.object, is_active=True).select_related("created_by").order_by("-likes", "-created_at")[:10]
+		lineups = Lineup.objects.filter(mapa=self.object, is_published=True).select_related("created_by").prefetch_related("slide").order_by("-likes", "-created_at")
+		
+		context.update({
+			"related_maps": related_maps,
+			"strategies": strategies,
+			"lineups": lineups,
+		})
 
 		return context
+
+@require_POST
+def lineup_vote(request, pk):
+	lineup = get_object_or_404(Lineup, pk=pk, is_published=True)
+	action = request.POST.get("vote")
+
+	if action not in ["up", "down"]:
+		return JsonResponse({"error": "Invalid vote"}, status=400)
+
+	votes = request.session.get("lineup_votes", {})
+
+	old_vote = votes.get(str(pk), 0)
+	new_vote = 1 if action == "up" else -1
+
+	# clicking same vote again removes it
+	if old_vote == new_vote:
+		new_vote = 0
+
+	delta = new_vote - old_vote
+
+	Lineup.objects.filter(pk=pk).update(
+		likes=F("likes") + delta
+	)
+
+	lineup.refresh_from_db(fields=["likes"])
+
+	if new_vote == 0:
+		votes.pop(str(pk), None)
+	else:
+		votes[str(pk)] = new_vote
+
+	request.session["lineup_votes"] = votes
+	request.session.modified = True
+
+	return JsonResponse({
+		"likes": lineup.likes,
+		"user_vote": new_vote,
+	})
