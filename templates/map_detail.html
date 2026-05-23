@@ -99,7 +99,7 @@
 					<div class="lineup-media lineup-expand-trigger">
 						<div class="lineup-slider">
 							<div class="lineup-track">
-								{% for img in lineup.slide.all %}
+								{% for img in lineup.slide.all|dictsort:"created_at" %}
 									<div class="lineup-slide">
 										<img src="{{ img.img.url }}" alt="{{ lineup.title }}">
 									</div>
@@ -368,7 +368,7 @@
 		});
 	}
 
-	document.querySelectorAll(".lineup-card").forEach(card => {
+	document.querySelectorAll(".lineups-grid > .lineup-card").forEach(card => {
 		const triggers = card.querySelectorAll(".lineup-expand-trigger");
 		triggers.forEach(trigger => {
 			trigger.addEventListener("click", event => {
