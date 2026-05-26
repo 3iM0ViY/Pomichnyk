@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ strat.name }}{% endblock %}
+
+{% block content %}
+<section class="strat-detail">
+	<header class="strat-hero">
+		<div>
+			<a href="{{ strat.mapa.get_absolute_url }}" class="back-link">← {{ strat.mapa.name }}</a>
+			<h1>{{ strat.name }}</h1>
+
+			<div class="strat-meta">
+				<span class="strategy-side">
+					{% if strat.side == "T" %}
+						<img src="{% static 'static_img/icons/t_logo.svg' %}" alt="T side">
+					{% else %}
+						<img src="{% static 'static_img/icons/ct_logo.svg' %}" alt="CT side">
+					{% endif %}
+				</span>
+				<div class="lineup-votes" data-vote-url="{% url 'home:strategy_vote' strat.pk %}">
+					<button class="vote-btn vote-down" type="button" data-vote="down">
+						<img src="{% static 'static_img/icons/chatwheel_negative.svg' %}" alt="Мінус">
+					</button>
+
+					<span class="likes-count">{{ strat.likes }} вподобайок</span>
+
+					<button class="vote-btn vote-up" type="button" data-vote="up">
+						<img src="{% static 'static_img/icons/chatwheel_affirmative.svg' %}" alt="Плюс">
+					</button>
+				</div>
+				{% if strat.created_by %}
+					<span class="lineup-votes">Автор: {{ strat.created_by }}</span>
+				{% endif %}
+			</div>
+		</div>
+	</header>
+
+	<section class="strat-body">
+		<article class="strat-content">
+			{% if strat.description %}
+				{{ strat.description|safe }}
+			{% else %}
+				<p class="empty-text">Опис цієї страти ще не додано.</p>
+			{% endif %}
+		</article>
+
+		{% if strat.slide.all %}
+			<aside class="strat-images">
+				{% for img in strat.slide.all %}
+					<figure class="strat-image-card">
+						<img
+							src="{% if img.img_mini %}{{ img.img_mini.url }}{% else %}{{ img.img.url }}{% endif %}"
+							alt="{{ img.alt_text|default:strat.name }}"
+						>
+
+						{% if img.alt_text %}
+							<figcaption>{{ img.alt_text }}</figcaption>
+						{% endif %}
+					</figure>
+				{% endfor %}
+			</aside>
+		{% endif %}
+	</section>
+
+</section>
+
+<script>
+	function getCookie(name) {
+		const value = `; ${document.cookie}`;
+		const parts = value.split(`; ${name}=`);
+		if (parts.length === 2) {
+			return parts.pop().split(";").shift();
+		}
+	}
+
+	/* =========================
+		Voting
+	========================= */
+	document.addEventListener("click", async event => {
+		const button = event.target.closest(".vote-btn");
+		if (!button) return;
+
+		const voteBox = button.closest(".lineup-votes");
+		if (!voteBox) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		const url = voteBox.dataset.voteUrl;
+		const formData = new FormData();
+		formData.append("vote", button.dataset.vote);
+
+		const response = await fetch(url, {
+			method: "POST",
+			headers: {
+				"X-CSRFToken": getCookie("csrftoken"),
+			},
+			body: formData,
+		});
+
+		if (!response.ok) return;
+
+		const data = await response.json();
+
+		document.querySelectorAll(`.lineup-votes[data-vote-url="${url}"]`).forEach(box => {
+			const count = box.querySelector(".likes-count");
+
+			count.textContent = data.likes;
+			count.classList.remove("bump-positive", "bump-negative");
+			void count.offsetWidth;
+
+			count.classList.add(
+				data.user_vote === -1
+					? "bump-negative"
+					: "bump-positive"
+			);
+
+			box.querySelectorAll(".vote-btn").forEach(btn => {
+				btn.classList.remove("active");
+			});
+
+			if (data.user_vote === 1) {
+				box.querySelector(".vote-up")?.classList.add("active");
+			}
+			if (data.user_vote === -1) {
+				box.querySelector(".vote-down")?.classList.add("active");
+			}
+		});
+	});
+</script>
+{% endblock %}

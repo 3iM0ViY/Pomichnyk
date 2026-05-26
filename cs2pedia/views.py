@@ -50,12 +50,10 @@ class MapDetailView(DetailView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
-		related_maps = Map.objects.filter(is_published=True, is_in_pool=self.object.is_in_pool).exclude(pk=self.object.pk)[:4]
 		strategies = Strategy.objects.filter(mapa=self.object, is_active=True).select_related("created_by").order_by("-likes", "-created_at")[:10]
 		lineups = Lineup.objects.filter(mapa=self.object, is_published=True).select_related("created_by").prefetch_related("slide").order_by("-likes", "-created_at")
 		
 		context.update({
-			"related_maps": related_maps,
 			"strategies": strategies,
 			"lineups": lineups,
 		})
@@ -97,5 +95,54 @@ def lineup_vote(request, pk):
 
 	return JsonResponse({
 		"likes": lineup.likes,
+		"user_vote": new_vote,
+	})
+
+class StratDetailView(DetailView):
+	model = Strategy
+	template_name = "strat_detail.html"
+	context_object_name = "strat"
+	slug_field = "slug"
+	slug_url_kwarg = "slug"
+
+	def get_queryset(self):
+		return (Strategy.objects.filter(is_active=True))
+
+
+@require_POST
+def strategy_vote(request, pk):
+	strategy = get_object_or_404(Strategy, pk=pk, is_active=True)
+	action = request.POST.get("vote")
+
+	if action not in ["up", "down"]:
+		return JsonResponse({"error": "Invalid vote"}, status=400)
+
+	votes = request.session.get("strategy_votes", {})
+
+	old_vote = votes.get(str(pk), 0)
+	new_vote = 1 if action == "up" else -1
+
+	# clicking same vote again removes it
+	if old_vote == new_vote:
+		new_vote = 0
+
+	delta = new_vote - old_vote
+
+	Strategy.objects.filter(pk=pk).update(
+		likes=F("likes") + delta
+	)
+
+	strategy.refresh_from_db(fields=["likes"])
+
+	if new_vote == 0:
+		votes.pop(str(pk), None)
+	else:
+		votes[str(pk)] = new_vote
+
+	request.session["strategy_votes"] = votes
+	request.session.modified = True
+
+	return JsonResponse({
+		"likes": strategy.likes,
 		"user_vote": new_vote,
 	})

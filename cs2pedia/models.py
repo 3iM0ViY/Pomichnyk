@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django_ckeditor_5.fields import CKEditor5Field
 
 # Create your models here.
 
@@ -49,8 +50,9 @@ class StratImg(models.Model):
 class Strategy(models.Model):
 	mapa = models.ForeignKey(Map, verbose_name="Мапа", on_delete=models.CASCADE, related_name="map_strategies")
 	name = models.CharField(verbose_name="Назва", max_length=200)
+	slug = models.SlugField(verbose_name='Слаг', unique=True)
 	side = models.CharField(verbose_name="Сторона", max_length=10, choices=[("T", "T"), ("CT", "CT")])
-	description = models.TextField(verbose_name="Вміст", blank=True)
+	description = CKEditor5Field(verbose_name="Вміст", config_name='extends', blank=True)
 	slide = models.ManyToManyField(StratImg, blank=True, verbose_name="Зображення")
 
 	likes = models.IntegerField(default=0, verbose_name="Вподобання")
@@ -65,6 +67,9 @@ class Strategy(models.Model):
 		verbose_name = "Страта"
 		verbose_name_plural = "Страти"
 		ordering = ["mapa", "name", "-likes",]
+
+	def get_absolute_url(self):
+		return reverse('pomichnyk_core:strat_detail', args=[self.slug,])
 
 class LineupImg(models.Model):
 	img = models.ImageField(verbose_name='Зображення', upload_to="cs2pedia/lineups")

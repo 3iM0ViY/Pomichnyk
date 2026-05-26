@@ -31,7 +31,7 @@
 			<div class="strategy-list">
 				{% for strat in strategies %}
 					{% if strat.is_active %}
-						<a href="#" class="strategy-card">
+						<a href="{{ strat.get_absolute_url }}" class="strategy-card">
 							<div class="strategy-top">
 								<span class="strategy-name">{{ strat.name }}</span>
 								<span class="strategy-side">
@@ -126,7 +126,12 @@
 
 					<div class="lineup-info">
 						<div class="lineup-heading">
-							<h3 class="lineup-expand-trigger">{{ lineup.title }}</h3>
+							<div>
+								<p class="muted">{{ lineup.description }}</p>
+								{% if lineup.comment %}
+									<p class="muted comment">{{ lineup.comment }}</p>
+								{% endif %}
+							</div>
 							<div class="utility-icon">
 								{% if lineup.utility == "smoke" %}
 									<img src="{% static 'static_img/icons/smokegrenade.svg' %}" alt="Smoke">
@@ -141,11 +146,6 @@
 								{% endif %}
 							</div>
 						</div>
-
-						<p class="muted">{{ lineup.description }}</p>
-						{% if lineup.comment %}
-							<p class="muted comment">{{ lineup.comment }}</p>
-						{% endif %}
 						<div class="lineup-meta">
 							<span>Звідки: {{ lineup.throw_from }}</span>
 							<span>Куди: {{ lineup.land_at }}</span>

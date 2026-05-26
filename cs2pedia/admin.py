@@ -125,7 +125,7 @@ class StratImgInline(admin.TabularInline):
 class StrategyAdmin(admin.ModelAdmin):
 	fieldsets = (
 		("Основне", {
-			"fields": ("mapa", "name", "side")
+			"fields": ("mapa", "name", "slug", "side")
 		}),
 		("Контент", {
 			"fields": ("description",)
@@ -142,6 +142,7 @@ class StrategyAdmin(admin.ModelAdmin):
 	search_fields = ("name", "description",)
 	readonly_fields = ("likes", "created_by", "created_at",)
 	show_facets = admin.ShowFacets.ALWAYS
+	prepopulated_fields = {'slug': ('name',)}
 
 	inlines = [StratImgInline]
 
