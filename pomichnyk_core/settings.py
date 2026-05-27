@@ -22,6 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import environ
 import os
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -37,6 +39,12 @@ env = environ.Env(
 	DEBUG=(bool, True)
 )
 DEBUG = env('DEBUG')
+
+ADMINS = [
+    ("Yulian T", "yulian.tolkachov@gmail.com"),
+]
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = [
 	'127.0.0.1',
