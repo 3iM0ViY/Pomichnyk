@@ -16,7 +16,20 @@ jobs:
       - name: Deploy files with rsync
         uses: burnett01/rsync-deployments@7.0.2
         with:
-          switches: -avzr --delete
+          switches: >-
+            -avzr --delete
+            --exclude=.git
+            --exclude=.github
+            --exclude=venv
+            --exclude=.env
+            --exclude=.htaccess
+            --exclude=cgi-bin
+            --exclude=public
+            --exclude=stderr.log
+            --exclude=tmp
+            --exclude=db.sqlite3
+            --exclude=media
+            --exclude=__pycache__
           path: ./
           remote_path: ${{ secrets.CPANEL_PROJECT_PATH }}/
           remote_host: ${{ secrets.CPANEL_HOST }}
