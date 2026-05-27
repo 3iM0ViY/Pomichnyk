@@ -22,6 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import environ
 import os
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -38,8 +40,16 @@ env = environ.Env(
 )
 DEBUG = env('DEBUG')
 
+ADMINS = [
+    ("Yulian T", "yulian.tolkachov@gmail.com"),
+]
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 ALLOWED_HOSTS = [
 	'127.0.0.1',
+	'pomichnyk.yuliandev.space',
+	'www.pomichnyk.yuliandev.space',
 ]
 
 
@@ -52,7 +62,6 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
-	'django_ckeditor_5',
 	'cs2pedia.apps.Cs2PediaConfig',
 ]
 
@@ -139,13 +148,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = "/home/h67964c/pomichnyk.yuliandev.space/static" # this server settings
 STATICFILES_DIRS = [
 	os.path.join(BASE_DIR, "staticfiles"),
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
 
 
 customColorPalette = [

@@ -1,5 +1,6 @@
 asgiref==3.11.1
-Django==6.0.4
+Django
+django-ckeditor-5==0.2.20
 django-environ==0.13.0
 pillow==12.2.0
 sqlparse==0.5.5
