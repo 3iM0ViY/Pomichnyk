@@ -17,19 +17,20 @@ jobs:
         uses: burnett01/rsync-deployments@7.0.2
         with:
           switches: >-
-            -avzr --delete
+            -avzr
             --exclude=.git
             --exclude=.github
             --exclude=venv
             --exclude=.env
-            --exclude=.htaccess
-            --exclude=cgi-bin
-            --exclude=public
-            --exclude=stderr.log
-            --exclude=tmp
             --exclude=db.sqlite3
             --exclude=media
+            --exclude=tmp
             --exclude=__pycache__
+            --exclude=.htaccess
+            --exclude=passenger_wsgi.py
+            --exclude=stderr.log
+            --exclude=cgi-bin
+            --exclude=public
           path: ./
           remote_path: ${{ secrets.CPANEL_PROJECT_PATH }}/
           remote_host: ${{ secrets.CPANEL_HOST }}
