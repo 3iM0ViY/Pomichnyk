@@ -1,5 +1,5 @@
 asgiref==3.11.1
-Django>=5.2,<6.0
+Django
 django-ckeditor-5==0.2.20
 django-environ==0.13.0
 pillow==12.2.0
