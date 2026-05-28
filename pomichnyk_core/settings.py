@@ -164,6 +164,10 @@ else:
 	MEDIA_ROOT = "/home/h67964c/pomichnyk/media" # this server settings
 
 
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "pomichnyk_core:creator_dashboard"
+LOGOUT_REDIRECT_URL = "pomichnyk_core:index"
+
 
 customColorPalette = [
 	{

@@ -1,11 +1,19 @@
 from django.shortcuts import render
 from .models import *
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, TemplateView, UpdateView, DeleteView
 from django.db.models import F
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
+
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from .forms import *
+
 
 # Create your views here.
 def index(request):
@@ -146,3 +154,78 @@ def strategy_vote(request, pk):
 		"likes": strategy.likes,
 		"user_vote": new_vote,
 	})
+
+
+
+class RegisterView(CreateView):
+	form_class = UserCreationForm
+	template_name = "registration/register.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
+
+	def form_valid(self, form):
+		response = super().form_valid(form)
+		login(self.request, self.object)
+		return response
+
+
+class CreatorDashboardView(LoginRequiredMixin, TemplateView):
+	template_name = "creator/dashboard.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+
+		strategies = self.request.user.creator_strategies.select_related("mapa").all()
+		lineups = self.request.user.creator_lineups.select_related("mapa").all()
+		
+		context.update({
+			"strategies": strategies,
+			"lineups": lineups,
+		})
+
+		return context
+
+# a reusable ownership mixin
+class CreatorOnlyMixin(LoginRequiredMixin, UserPassesTestMixin):
+	def test_func(self):
+		obj = self.get_object()
+		return obj.created_by == self.request.user
+
+# User made stategies
+class StrategyCreateView(LoginRequiredMixin, CreateView):
+	model = Strategy
+	form_class = StrategyForm
+	template_name = "creator/strategy_form.html"
+
+	def form_valid(self, form):
+		form.instance.created_by = self.request.user
+		return super().form_valid(form)
+
+class StrategyUpdateView(CreatorOnlyMixin, UpdateView):
+	model = Strategy
+	form_class = StrategyForm
+	template_name = "creator/strategy_form.html"
+
+class StrategyDeleteView(CreatorOnlyMixin, DeleteView):
+	model = Strategy
+	template_name = "creator/strategy_confirm_delete.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
+
+# User made lineups
+class LineupCreateView(LoginRequiredMixin, CreateView):
+	model = Lineup
+	form_class = LineupForm
+	template_name = "creator/lineup_form.html"
+
+	def form_valid(self, form):
+		form.instance.created_by = self.request.user
+		return super().form_valid(form)
+
+class LineupUpdateView(CreatorOnlyMixin, UpdateView):
+	model = Lineup
+	form_class = LineupForm
+	template_name = "creator/lineup_form.html"
+
+class LineupDeleteView(CreatorOnlyMixin, DeleteView):
+	model = Lineup
+	template_name = "creator/lineup_confirm_delete.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")

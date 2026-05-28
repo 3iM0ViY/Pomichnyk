@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Кабінет автора | Pomichnyk{% endblock %}
+
+{% block content %}
+<section class="creator-dashboard">
+	<header class="creator-hero">
+		<div>
+			<p class="eyebrow">Кабінет автора</p>
+			<h1>{{ user.username }}</h1>
+			<p>Тут можна створювати й редагувати власні страти та лайнапи.</p>
+		</div>
+
+		<div class="creator-actions">
+			<a href="{% url 'pomichnyk_core:strategy_create' %}" class="btn-primary">+ Нова страта</a>
+			<a href="{% url 'pomichnyk_core:lineup_create' %}" class="btn-secondary">+ Новий лайнап</a>
+		</div>
+	</header>
+
+	<section class="creator-section">
+		<h2>Мої страти</h2>
+
+		<div class="creator-list">
+			{% for strat in strategies %}
+				<article class="creator-item">
+					<div>
+						<h3>{{ strat.name }}</h3>
+						<p>{{ strat.mapa.name }} · {{ strat.side }} · {{ strat.likes }} вподобань</p>
+					</div>
+
+					<div class="item-actions">
+						<a href="{{ strat.get_absolute_url }}">Переглянути</a>
+						<a href="{% url 'pomichnyk_core:strategy_update' strat.slug %}">Редагувати</a>
+						<a href="{% url 'pomichnyk_core:strategy_delete' strat.slug %}">Видалити</a>
+					</div>
+				</article>
+			{% empty %}
+				<p>Ти ще не створив жодної страти.</p>
+			{% endfor %}
+		</div>
+	</section>
+
+	<section class="creator-section">
+		<h2>Мої лайнапи</h2>
+
+		<div class="creator-list">
+			{% for lineup in lineups %}
+				<article class="creator-item">
+					<div>
+						<h3>{{ lineup.title }}</h3>
+						<p>{{ lineup.mapa.name }} · {{ lineup.get_utility_display }} · {{ lineup.likes }} вподобань</p>
+					</div>
+
+					<div class="item-actions">
+						<a href="{% url 'pomichnyk_core:lineup_update' lineup.pk %}">Редагувати</a>
+						<a href="{% url 'pomichnyk_core:lineup_delete' lineup.pk %}">Видалити</a>
+					</div>
+				</article>
+			{% empty %}
+				<p>Ти ще не створив жодного лайнапу.</p>
+			{% endfor %}
+		</div>
+	</section>
+</section>
+{% endblock %}
