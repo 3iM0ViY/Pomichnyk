@@ -5,16 +5,40 @@
 {% block content %}
 <section class="auth-page">
 	<div class="auth-card">
-		<h1>Увійти</h1>
+		<div class="auth-header">
+			<p class="auth-eyebrow">Creator access</p>
+			<h1>Увійти</h1>
+			<p>Увійди, щоб створювати й редагувати власні страти та лайнапи.</p>
+		</div>
 
-		<form method="post">
+		<form method="post" class="auth-form">
 			{% csrf_token %}
-			{{ form.as_p }}
+
+			{% if form.non_field_errors %}
+				<div class="form-errors">
+					{{ form.non_field_errors }}
+				</div>
+			{% endif %}
+
+			{% for field in form %}
+				<div class="form-group">
+					<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+					{{ field }}
+
+					{% if field.help_text %}
+						<small>{{ field.help_text }}</small>
+					{% endif %}
+
+					{% for error in field.errors %}
+						<p class="field-error">{{ error }}</p>
+					{% endfor %}
+				</div>
+			{% endfor %}
 
 			<button type="submit" class="btn-primary">Увійти</button>
 		</form>
 
-		<p>
+		<p class="auth-switch">
 			Ще немає акаунта?
 			<a href="{% url 'pomichnyk_core:register' %}">Зареєструватися</a>
 		</p>

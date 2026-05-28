@@ -166,7 +166,7 @@ else:
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "pomichnyk_core:creator_dashboard"
-LOGOUT_REDIRECT_URL = "pomichnyk_core:index"
+LOGOUT_REDIRECT_URL = "pomichnyk_core:home"
 
 
 customColorPalette = [
