@@ -147,7 +147,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 if DEBUG:
 	STATIC_ROOT = os.path.join(BASE_DIR, "static")
 else:
@@ -160,7 +160,7 @@ MEDIA_URL = '/media/'
 if DEBUG:
 	MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 else:
-	MEDIA_ROOT = "/home/h67964c/pomichnyk/media" # this server settings
+	MEDIA_ROOT = "/home/h67964c/pomichnyk.yuliandev.space/media" # this server settings
 
 
 
