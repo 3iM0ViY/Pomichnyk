@@ -1,6 +1,6 @@
 from django import forms
-from .models import Strategy, Lineup
-
+from .models import *
+from django.forms import modelformset_factory
 
 class StrategyForm(forms.ModelForm):
 	class Meta:
@@ -14,7 +14,9 @@ class StrategyForm(forms.ModelForm):
 			"slide",
 			"is_active",
 		]
-
+		widgets = {
+			"slide": forms.CheckboxSelectMultiple,
+		}
 
 class LineupForm(forms.ModelForm):
 	class Meta:
@@ -31,3 +33,30 @@ class LineupForm(forms.ModelForm):
 			"video_url",
 			"is_published",
 		]
+		widgets = {
+			"slide": forms.CheckboxSelectMultiple,
+		}
+
+class StratImgUploadForm(forms.ModelForm):
+	class Meta:
+		model = StratImg
+		fields = ["img", "alt_text"]
+
+class LineupImgUploadForm(forms.ModelForm):
+	class Meta:
+		model = LineupImg
+		fields = ["img", "alt_text"]
+
+StratImgUploadFormSet = modelformset_factory(
+	StratImg,
+	form=StratImgUploadForm,
+	extra=1,
+	can_delete=True,
+)
+
+LineupImgUploadFormSet = modelformset_factory(
+	LineupImg,
+	form=LineupImgUploadForm,
+	extra=1,
+	can_delete=True,
+)

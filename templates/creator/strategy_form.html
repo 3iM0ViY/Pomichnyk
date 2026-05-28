@@ -51,6 +51,78 @@
 			{% endfor %}
 		</div>
 
+		<section class="inline-upload-section" data-formset-prefix="{{ image_formset.prefix }}">
+			<div class="inline-upload-header">
+				<div>
+					<p class="eyebrow">Images</p>
+					<h2>Додати нові зображення</h2>
+				</div>
+
+				<p>Нові зображення будуть автоматично привʼязані до цієї страти.</p>
+			</div>
+
+			{{ image_formset.management_form }}
+
+			<div class="inline-upload-table">
+				<div class="inline-upload-row inline-upload-head">
+					<span>Зображення</span>
+					<span>Підпис</span>
+					<span></span>
+				</div>
+
+				<div class="inline-upload-rows" id="upload-formset-rows">
+					{% for image_form in image_formset %}
+						<div class="inline-upload-row upload-form-row">
+							{% for hidden in image_form.hidden_fields %}
+								{{ hidden }}
+							{% endfor %}
+
+							<div class="form-group">
+								{{ image_form.img }}
+
+								{% for error in image_form.img.errors %}
+									<p class="field-error">{{ error }}</p>
+								{% endfor %}
+							</div>
+
+							<div class="form-group">
+								{{ image_form.alt_text }}
+
+								{% for error in image_form.alt_text.errors %}
+									<p class="field-error">{{ error }}</p>
+								{% endfor %}
+							</div>
+
+							<button type="button" class="inline-remove-row" aria-label="Прибрати рядок">×</button>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<template id="empty-upload-form-template">
+				<div class="inline-upload-row upload-form-row">
+					{% for hidden in image_formset.empty_form.hidden_fields %}
+						{{ hidden }}
+					{% endfor %}
+
+					<div class="form-group">
+						{{ image_formset.empty_form.img }}
+					</div>
+
+					<div class="form-group">
+						{{ image_formset.empty_form.alt_text }}
+					</div>
+
+					<button type="button" class="inline-remove-row" aria-label="Прибрати рядок">×</button>
+				</div>
+			</template>
+
+			<button type="button" class="inline-add-row" id="add-upload-row">
+				<span>+</span>
+				Додати ще зображення
+			</button>
+		</section>
+
 		<div class="creator-form-actions">
 			<a href="{% url 'pomichnyk_core:creator_dashboard' %}" class="btn-secondary">Скасувати</a>
 
@@ -60,4 +132,102 @@
 		</div>
 	</form>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+	const section = document.querySelector(".inline-upload-section");
+	if (!section) return;
+
+	const prefix = section.dataset.formsetPrefix;
+	const rowsContainer = section.querySelector("#upload-formset-rows");
+	const addButton = section.querySelector("#add-upload-row");
+	const template = section.querySelector("#empty-upload-form-template");
+	const totalFormsInput = document.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+
+	if (!rowsContainer || !addButton || !template || !totalFormsInput) return;
+
+	function updateRemoveButtons() {
+		const rows = rowsContainer.querySelectorAll(".upload-form-row");
+
+		rows.forEach((row) => {
+			const removeButton = row.querySelector(".inline-remove-row");
+			if (!removeButton) return;
+
+			removeButton.disabled = rows.length <= 1;
+			removeButton.classList.toggle("disabled", rows.length <= 1);
+		});
+	}
+
+	function clearFileInputValue(row) {
+		const fileInputs = row.querySelectorAll('input[type="file"]');
+
+		fileInputs.forEach((input) => {
+			input.value = "";
+		});
+	}
+
+	function addRow() {
+		const formIndex = Number(totalFormsInput.value);
+		const html = template.innerHTML.replaceAll("__prefix__", formIndex);
+
+		rowsContainer.insertAdjacentHTML("beforeend", html);
+		totalFormsInput.value = formIndex + 1;
+
+		const newRow = rowsContainer.lastElementChild;
+		clearFileInputValue(newRow);
+
+		updateRemoveButtons();
+	}
+
+	function removeRow(row) {
+		row.remove();
+
+		const rows = rowsContainer.querySelectorAll(".upload-form-row");
+		totalFormsInput.value = rows.length;
+
+		rows.forEach((row, index) => {
+			row.querySelectorAll("input, select, textarea, label").forEach((element) => {
+				if (element.name) {
+					element.name = element.name.replace(
+						new RegExp(`${prefix}-\\d+-`),
+						`${prefix}-${index}-`
+					);
+				}
+
+				if (element.id) {
+					element.id = element.id.replace(
+						new RegExp(`id_${prefix}-\\d+-`),
+						`id_${prefix}-${index}-`
+					);
+				}
+
+				if (element.htmlFor) {
+					element.htmlFor = element.htmlFor.replace(
+						new RegExp(`id_${prefix}-\\d+-`),
+						`id_${prefix}-${index}-`
+					);
+				}
+			});
+		});
+
+		updateRemoveButtons();
+	}
+
+	addButton.addEventListener("click", addRow);
+
+	rowsContainer.addEventListener("click", (event) => {
+		const removeButton = event.target.closest(".inline-remove-row");
+		if (!removeButton || removeButton.disabled) return;
+
+		const row = removeButton.closest(".upload-form-row");
+		if (!row) return;
+
+		removeRow(row);
+	});
+
+	updateRemoveButtons();
+});
+</script>
 {% endblock %}

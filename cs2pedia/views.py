@@ -13,6 +13,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .forms import *
+from django.db import transaction
+from django.http import HttpResponseRedirect
 
 
 # Create your views here.
@@ -197,15 +199,95 @@ class StrategyCreateView(LoginRequiredMixin, CreateView):
 	template_name = "creator/strategy_form.html"
 	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
 
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+
+		if self.request.POST:
+			context["image_formset"] = StratImgUploadFormSet(
+				self.request.POST,
+				self.request.FILES,
+				queryset=Strategy.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+		else:
+			context["image_formset"] = StratImgUploadFormSet(
+				queryset=Strategy.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+
+		return context
+
 	def form_valid(self, form):
+		context = self.get_context_data()
+		image_formset = context["image_formset"]
+
+		if not image_formset.is_valid():
+			return self.form_invalid(form)
+
 		form.instance.created_by = self.request.user
-		return super().form_valid(form)
+
+		self.object = form.save(commit=False)
+		self.object.save()
+		form.save_m2m()
+
+		selected_images = list(form.cleaned_data.get("slide", []))
+		new_images = []
+
+		for image_form in image_formset:
+			if image_form.cleaned_data and image_form.cleaned_data.get("img"):
+				image = image_form.save()
+				new_images.append(image)
+
+		self.object.slide.set(selected_images + new_images)
+
+		return HttpResponseRedirect(self.get_success_url())
 
 class StrategyUpdateView(CreatorOnlyMixin, UpdateView):
 	model = Strategy
 	form_class = StrategyForm
 	template_name = "creator/strategy_form.html"
 	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+
+		if self.request.POST:
+			context["image_formset"] = StratImgUploadFormSet(
+				self.request.POST,
+				self.request.FILES,
+				queryset=Strategy.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+		else:
+			context["image_formset"] = StratImgUploadFormSet(
+				queryset=Strategy.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+
+		return context
+
+	def form_valid(self, form):
+		context = self.get_context_data()
+		image_formset = context["image_formset"]
+
+		if not image_formset.is_valid():
+			return self.form_invalid(form)
+
+		self.object = form.save(commit=False)
+		self.object.save()
+		form.save_m2m()
+
+		selected_images = list(form.cleaned_data.get("slide", []))
+		new_images = []
+
+		for image_form in image_formset:
+			if image_form.cleaned_data and image_form.cleaned_data.get("img"):
+				image = image_form.save()
+				new_images.append(image)
+				
+		self.object.slide.set(selected_images + new_images)
+
+		return HttpResponseRedirect(self.get_success_url())
 
 class StrategyDeleteView(CreatorOnlyMixin, DeleteView):
 	model = Strategy
@@ -219,15 +301,94 @@ class LineupCreateView(LoginRequiredMixin, CreateView):
 	template_name = "creator/lineup_form.html"
 	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
 
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+
+		if self.request.POST:
+			context["image_formset"] = LineupImgUploadFormSet(
+				self.request.POST,
+				self.request.FILES,
+				queryset=Lineup.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+		else:
+			context["image_formset"] = LineupImgUploadFormSet(
+				queryset=Lineup.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+
+		return context
+
 	def form_valid(self, form):
+		context = self.get_context_data()
+		image_formset = context["image_formset"]
+
+		if not image_formset.is_valid():
+			return self.form_invalid(form)
+
 		form.instance.created_by = self.request.user
-		return super().form_valid(form)
+		self.object = form.save(commit=False)
+		self.object.save()
+		form.save_m2m()
+
+		selected_images = list(form.cleaned_data.get("slide", []))
+		new_images = []
+
+		for image_form in image_formset:
+			if image_form.cleaned_data and image_form.cleaned_data.get("img"):
+				image = image_form.save()
+				new_images.append(image)
+				
+		self.object.slide.set(selected_images + new_images)
+
+		return HttpResponseRedirect(self.get_success_url())
 
 class LineupUpdateView(CreatorOnlyMixin, UpdateView):
 	model = Lineup
 	form_class = LineupForm
 	template_name = "creator/lineup_form.html"
 	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+
+		if self.request.POST:
+			context["image_formset"] = LineupImgUploadFormSet(
+				self.request.POST,
+				self.request.FILES,
+				queryset=Lineup.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+		else:
+			context["image_formset"] = LineupImgUploadFormSet(
+				queryset=Lineup.slide.field.related_model.objects.none(),
+				prefix="new_images",
+			)
+
+		return context
+
+	def form_valid(self, form):
+		context = self.get_context_data()
+		image_formset = context["image_formset"]
+
+		if not image_formset.is_valid():
+			return self.form_invalid(form)
+
+		self.object = form.save(commit=False)
+		self.object.save()
+		form.save_m2m()
+
+		selected_images = list(form.cleaned_data.get("slide", []))
+		new_images = []
+
+		for image_form in image_formset:
+			if image_form.cleaned_data and image_form.cleaned_data.get("img"):
+				image = image_form.save()
+				new_images.append(image)
+				
+		self.object.slide.set(selected_images + new_images)
+
+		return HttpResponseRedirect(self.get_success_url())
 
 class LineupDeleteView(CreatorOnlyMixin, DeleteView):
 	model = Lineup
