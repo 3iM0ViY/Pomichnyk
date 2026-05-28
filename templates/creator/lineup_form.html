@@ -1,25 +1,23 @@
 {% extends "base.html" %}
 
 {% block title %}
-	{% if object %}Редагувати страту{% else %}Нова страта{% endif %} | Pomichnyk
+	{% if object %}Редагувати лайнап{% else %}Новий лайнап{% endif %} | Pomichnyk
 {% endblock %}
 
 {% block content %}
-{{ form.media }}
-
 <section class="creator-form-page">
 	<header class="creator-form-hero">
 		<div>
 			<a href="{% url 'pomichnyk_core:creator_dashboard' %}" class="back-link">← Кабінет автора</a>
 
-			<p class="eyebrow">Strategy editor</p>
+			<p class="eyebrow">Lineup editor</p>
 
 			{% if object %}
-				<h1>Редагувати страту</h1>
-				<p>Онови назву, сторону, опис або прикріплені зображення.</p>
+				<h1>Редагувати лайнап</h1>
+				<p>Онови гранату, позиції, опис або прикріплені зображення.</p>
 			{% else %}
-				<h1>Нова страта</h1>
-				<p>Опиши ідею, додай мапу, сторону й підготуй її до публікації.</p>
+				<h1>Новий лайнап</h1>
+				<p>Додай мапу, тип гранати, звідки кидати й куди вона прилітає.</p>
 			{% endif %}
 		</div>
 	</header>
@@ -35,7 +33,7 @@
 
 		<div class="creator-form-grid">
 			{% for field in form %}
-				<div class="form-group {% if field.name == 'description' or field.name == 'slide' %}form-group-full{% endif %}">
+				<div class="form-group {% if field.name == 'comment' or field.name == 'slide' or field.name == 'video_url' %}form-group-full{% endif %}">
 					<label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
 					{{ field }}
@@ -55,7 +53,7 @@
 			<a href="{% url 'pomichnyk_core:creator_dashboard' %}" class="btn-secondary">Скасувати</a>
 
 			<button type="submit" class="btn-primary">
-				{% if object %}Зберегти зміни{% else %}Створити страту{% endif %}
+				{% if object %}Зберегти зміни{% else %}Створити лайнап{% endif %}
 			</button>
 		</div>
 	</form>

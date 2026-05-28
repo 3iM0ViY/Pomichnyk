@@ -195,6 +195,7 @@ class StrategyCreateView(LoginRequiredMixin, CreateView):
 	model = Strategy
 	form_class = StrategyForm
 	template_name = "creator/strategy_form.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
 
 	def form_valid(self, form):
 		form.instance.created_by = self.request.user
@@ -204,6 +205,7 @@ class StrategyUpdateView(CreatorOnlyMixin, UpdateView):
 	model = Strategy
 	form_class = StrategyForm
 	template_name = "creator/strategy_form.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
 
 class StrategyDeleteView(CreatorOnlyMixin, DeleteView):
 	model = Strategy
@@ -215,6 +217,7 @@ class LineupCreateView(LoginRequiredMixin, CreateView):
 	model = Lineup
 	form_class = LineupForm
 	template_name = "creator/lineup_form.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
 
 	def form_valid(self, form):
 		form.instance.created_by = self.request.user
@@ -224,6 +227,7 @@ class LineupUpdateView(CreatorOnlyMixin, UpdateView):
 	model = Lineup
 	form_class = LineupForm
 	template_name = "creator/lineup_form.html"
+	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
 
 class LineupDeleteView(CreatorOnlyMixin, DeleteView):
 	model = Lineup
