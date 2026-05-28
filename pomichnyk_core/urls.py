@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
+	path("accounts/", include("django.contrib.auth.urls")),
 	path('', include('cs2pedia.urls', namespace="pomichnyk_core")),
 	path("ckeditor5/", include('django_ckeditor_5.urls')),
 ] 

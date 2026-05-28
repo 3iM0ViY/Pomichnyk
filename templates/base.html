@@ -26,7 +26,13 @@
 				<ul class="nav-links">
 					<li><a href="{% url 'pomichnyk_core:maps' %}">Мапи</a></li>
 					<li><a href="#">Філософія</a></li>
-					<li><a href="#">Адмінка</a></li>
+					<li>
+						{% if user.is_authenticated %}
+							<a href="{% url 'pomichnyk_core:creator_dashboard' %}">Адмінка</a>
+						{% else %}
+							<a href="{% url 'login' %}">Адмінка</a>
+						{% endif %}
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -52,7 +58,11 @@
 				</div>
 			</a>
 
-			<a href="/admin/" class="dash-card dash-admin">
+		{% if user.is_authenticated %}
+			<a href="{% url 'pomichnyk_core:creator_dashboard' %}" class="dash-card dash-admin">
+		{% else %}
+			<a href="{% url 'login' %}" class="dash-card dash-admin">
+		{% endif %}
 				<div class="dash-bg" style="background-image: url('{% static "static_img/csgo_polizei.png" %}')"></div>
 				<div class="dash-content">
 					<h2>Адмінка</h2>

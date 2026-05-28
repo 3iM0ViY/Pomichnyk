@@ -122,3 +122,13 @@ class Lineup(models.Model):
 		if "youtube.com" in self.video_url:
 			return self.video_url.replace("watch?v=", "embed/")
 		return self.video_url
+
+class Profile(models.Model):
+	user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name="Користувач", on_delete=models.CASCADE, related_name="profile",)
+
+	display_name = models.CharField(verbose_name="Нікнейм", max_length=100, blank=True)
+	bio = models.TextField(verbose_name="Біо", blank=True)
+	avatar = models.ImageField(verbose_name="Аватарка", upload_to="profiles/avatars/", blank=True, null=True)
+
+	def __str__(self):
+		return self.display_name or self.user.username

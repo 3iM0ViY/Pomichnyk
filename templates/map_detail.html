@@ -95,7 +95,7 @@
 		</div>
 		<div class="lineups-grid">
 			{% for lineup in lineups %}
-				<article class="lineup-card lineup-{{ lineup.utility }}">
+				<article class="lineup-card lineup-{{ lineup.utility }}" id="{{ lineup.pk }}">
 					<div class="lineup-media lineup-expand-trigger">
 						<div class="lineup-slider">
 							<div class="lineup-track">

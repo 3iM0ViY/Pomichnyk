@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Кабінет автора | Pomichnyk{% endblock %}
+
+{% block content %}
+<section class="creator-dashboard">
+	<header class="creator-hero">
+		<div class="creator-hero-content">
+			<p class="eyebrow">Кабінет автора</p>
+			<h1>{{ user.username }}</h1>
+			<p>
+				Тут можна створювати й редагувати власні страти та лайнапи.
+				Розвлікайтесь.
+			</p>
+		</div>
+
+		<div class="creator-actions">
+			<a href="{% url 'pomichnyk_core:strategy_create' %}" class="btn-primary">+ Нова страта</a>
+			<a href="{% url 'pomichnyk_core:lineup_create' %}" class="btn-secondary">+ Новий лайнап</a>
+		</div>
+	</header>
+
+	<div class="creator-stats">
+		<div class="creator-stat-card">
+			<span class="stat-value">{{ strategies|length }}</span>
+			<span class="stat-label">страт</span>
+		</div>
+
+		<div class="creator-stat-card">
+			<span class="stat-value">{{ lineups|length }}</span>
+			<span class="stat-label">лайнапів</span>
+		</div>
+
+		<div class="creator-stat-card">
+			<span class="stat-value">{{ user.date_joined|date:"d.m.Y" }}</span>
+			<span class="stat-label">дата реєстрації</span>
+		</div>
+	</div>
+
+	<section class="creator-section">
+		<div class="creator-section-header">
+			<div>
+				<p class="eyebrow">Strategies</p>
+				<h2>Мої страти</h2>
+			</div>
+
+			<a href="{% url 'pomichnyk_core:strategy_create' %}" class="section-action">Додати страту</a>
+		</div>
+
+		<div class="creator-list">
+			{% for strat in strategies %}
+				<article class="creator-item">
+					<div class="creator-item-main">
+						<div class="creator-item-icon side-{{ strat.side|lower }}">
+							{{ strat.side }}
+						</div>
+
+						<div>
+							<h3>{{ strat.name }}</h3>
+							<p>
+								{{ strat.mapa.name }}
+								<span>·</span>
+								{{ strat.side }}
+								<span>·</span>
+								{{ strat.likes }} вподобань
+							</p>
+						</div>
+					</div>
+
+					<div class="item-actions">
+						<a href="{{ strat.get_absolute_url }}">Переглянути</a>
+						<a href="{% url 'pomichnyk_core:strategy_update' strat.slug %}">Редагувати</a>
+						<button
+							type="button"
+							class="danger-link delete-trigger"
+							data-delete-url="{% url 'pomichnyk_core:strategy_delete' strat.slug %}"
+							data-delete-type="Страта"
+							data-delete-title="{{ strat.name }}"
+							data-delete-meta="{{ strat.mapa.name }} · {{ strat.side }} · {{ strat.likes }} вподобань"
+							data-delete-preview-url="{{ strat.get_absolute_url }}"
+							data-delete-template="delete-images-strat-{{ strat.pk }}"
+						>
+							Видалити
+						</button>
+
+						<template id="delete-images-strat-{{ strat.pk }}">
+							{% for img in strat.slide.all %}
+								<div class="delete-slide">
+									<img src="{{ img.img.url }}" alt="{{ img.alt_text|default:strat.name }}">
+								</div>
+							{% empty %}
+								<div class="delete-slide delete-slide-empty">
+									<span>Немає preview</span>
+								</div>
+							{% endfor %}
+						</template>
+					</div>
+				</article>
+			{% empty %}
+				<div class="creator-empty">
+					<h3>Страт ще немає</h3>
+					<p>Створи першу страту — і вона зʼявиться тут.</p>
+					<a href="{% url 'pomichnyk_core:strategy_create' %}" class="btn-primary">+ Нова страта</a>
+				</div>
+			{% endfor %}
+		</div>
+	</section>
+
+	<section class="creator-section">
+		<div class="creator-section-header">
+			<div>
+				<p class="eyebrow">Lineups</p>
+				<h2>Мої лайнапи</h2>
+			</div>
+
+			<a href="{% url 'pomichnyk_core:lineup_create' %}" class="section-action">Додати лайнап</a>
+		</div>
+
+		<div class="creator-list">
+			{% for lineup in lineups %}
+				<article class="creator-item">
+					<div class="creator-item-main">
+						<div class="creator-item-icon utility-{{ lineup.utility }}">
+							{{ lineup.get_utility_display|slice:":1" }}
+						</div>
+
+						<div>
+							<h3>{{ lineup.title }}</h3>
+							<p>
+								{{ lineup.mapa.name }}
+								<span>·</span>
+								{{ lineup.get_utility_display }}
+								<span>·</span>
+								{{ lineup.likes }} вподобань
+							</p>
+						</div>
+					</div>
+
+					<div class="item-actions">
+						<a href="{{ lineup.mapa.get_absolute_url }}#{{ lineup.pk }}">Переглянути</a>
+						<a href="{% url 'pomichnyk_core:lineup_update' lineup.pk %}">Редагувати</a>
+						<button
+							type="button"
+							class="danger-link delete-trigger"
+							data-delete-url="{% url 'pomichnyk_core:lineup_delete' lineup.pk %}"
+							data-delete-type="Лайнап"
+							data-delete-title="{{ lineup.title }}"
+							data-delete-meta="{{ lineup.mapa.name }} · {{ lineup.get_utility_display }} · {{ lineup.likes }} вподобань"
+							data-delete-preview-url="{{ lineup.mapa.get_absolute_url }}#{{ lineup.pk }}"
+							data-delete-template="delete-images-lineup-{{ lineup.pk }}"
+						>
+							Видалити
+						</button>
+
+						<template id="delete-images-lineup-{{ lineup.pk }}">
+							{% for img in lineup.slide.all %}
+								<div class="delete-slide">
+									<img src="{{ img.img.url }}" alt="{{ img.alt_text|default:lineup.title }}">
+								</div>
+							{% empty %}
+								<div class="delete-slide delete-slide-empty">
+									<span>Немає preview</span>
+								</div>
+							{% endfor %}
+						</template>
+					</div>
+				</article>
+			{% empty %}
+				<div class="creator-empty">
+					<h3>Лайнапів ще немає</h3>
+					<p>Додай перший smoke, molotov або flash — і він зʼявиться тут.</p>
+					<a href="{% url 'pomichnyk_core:lineup_create' %}" class="btn-primary">+ Новий лайнап</a>
+				</div>
+			{% endfor %}
+		</div>
+	</section>
+</section>
+
+<div class="delete-modal" id="delete-modal" aria-hidden="true">
+	<div class="delete-modal-backdrop" data-delete-close></div>
+
+	<div class="delete-modal-content" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+		<button type="button" class="delete-modal-close" data-delete-close aria-label="Закрити">×</button>
+
+		<div class="delete-preview">
+			<div class="delete-preview-media" id="delete-preview-media">
+				<div class="delete-slider">
+					<div class="delete-track" id="delete-track">
+						<div class="delete-slide delete-slide-empty">
+							<span>Немає preview</span>
+						</div>
+					</div>
+
+					<button type="button" class="delete-slider-btn delete-slider-prev" aria-label="Попереднє зображення">
+						‹
+					</button>
+					<button type="button" class="delete-slider-btn delete-slider-next" aria-label="Наступне зображення">
+						›
+					</button>
+				</div>
+			</div>
+
+			<div class="delete-preview-body">
+				<p class="eyebrow" id="delete-modal-type">Видалення</p>
+				<h2 id="delete-modal-title">Видалити?</h2>
+				<p id="delete-modal-meta"></p>
+
+				<div class="delete-warning">
+					<strong>Цю дію не можна буде скасувати.</strong>
+					<span>Обʼєкт зникне з кабінету автора і з публічних сторінок.</span>
+				</div>
+
+				<a href="#" id="delete-modal-preview-link" class="delete-preview-link" target="_blank" rel="noopener">
+					Відкрити перед видаленням
+				</a>
+
+				<form method="post" id="delete-modal-form" class="delete-modal-actions">
+					{% csrf_token %}
+
+					<button type="button" class="btn-secondary" data-delete-close>Скасувати</button>
+					<button type="submit" class="btn-danger">Так, видалити</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+	const modal = document.querySelector("#delete-modal");
+	if (!modal) return;
+
+	const form = modal.querySelector("#delete-modal-form");
+	const title = modal.querySelector("#delete-modal-title");
+	const type = modal.querySelector("#delete-modal-type");
+	const meta = modal.querySelector("#delete-modal-meta");
+	const previewLink = modal.querySelector("#delete-modal-preview-link");
+
+	const track = modal.querySelector("#delete-track");
+	const prevBtn = modal.querySelector(".delete-slider-prev");
+	const nextBtn = modal.querySelector(".delete-slider-next");
+
+	const triggers = document.querySelectorAll(".delete-trigger");
+	const closeElements = modal.querySelectorAll("[data-delete-close]");
+
+	let index = 0;
+
+	function updateDeleteSlider() {
+		const slides = track.querySelectorAll(".delete-slide");
+		const maxIndex = slides.length - 1;
+
+		track.style.transform = `translateX(-${index * 100}%)`;
+
+		prevBtn.classList.toggle("disabled", index === 0 || maxIndex <= 0);
+		nextBtn.classList.toggle("disabled", index === maxIndex || maxIndex <= 0);
+	}
+
+	function loadSlidesFromTemplate(templateId) {
+		const template = document.querySelector(`#${templateId}`);
+
+		if (!template) {
+			track.innerHTML = `
+				<div class="delete-slide delete-slide-empty">
+					<span>Немає preview</span>
+				</div>
+			`;
+			return;
+		}
+
+		track.innerHTML = template.innerHTML.trim();
+
+		if (!track.children.length) {
+			track.innerHTML = `
+				<div class="delete-slide delete-slide-empty">
+					<span>Немає preview</span>
+				</div>
+			`;
+		}
+	}
+
+	function openModal(button) {
+		const deleteUrl = button.dataset.deleteUrl;
+		const deleteType = button.dataset.deleteType || "Обʼєкт";
+		const deleteTitle = button.dataset.deleteTitle || "Без назви";
+		const deleteMeta = button.dataset.deleteMeta || "";
+		const deletePreviewUrl = button.dataset.deletePreviewUrl;
+		const deleteTemplate = button.dataset.deleteTemplate;
+
+		form.action = deleteUrl;
+		type.textContent = `Видалення · ${deleteType}`;
+		title.textContent = deleteTitle;
+		meta.textContent = deleteMeta;
+
+		if (deletePreviewUrl) {
+			previewLink.href = deletePreviewUrl;
+			previewLink.style.display = "";
+		} else {
+			previewLink.href = "#";
+			previewLink.style.display = "none";
+		}
+
+		index = 0;
+		loadSlidesFromTemplate(deleteTemplate);
+		updateDeleteSlider();
+
+		modal.classList.add("active");
+		modal.setAttribute("aria-hidden", "false");
+		document.body.classList.add("modal-open");
+	}
+
+	function closeModal() {
+		modal.classList.remove("active");
+		modal.setAttribute("aria-hidden", "true");
+		document.body.classList.remove("modal-open");
+		form.action = "";
+		index = 0;
+	}
+
+	nextBtn?.addEventListener("click", event => {
+		event.stopPropagation();
+
+		const slides = track.querySelectorAll(".delete-slide");
+		const maxIndex = slides.length - 1;
+
+		if (index < maxIndex) {
+			index++;
+			updateDeleteSlider();
+		}
+	});
+
+	prevBtn?.addEventListener("click", event => {
+		event.stopPropagation();
+
+		if (index > 0) {
+			index--;
+			updateDeleteSlider();
+		}
+	});
+
+	triggers.forEach(button => {
+		button.addEventListener("click", () => openModal(button));
+	});
+
+	closeElements.forEach(element => {
+		element.addEventListener("click", closeModal);
+	});
+
+	document.addEventListener("keydown", event => {
+		if (!modal.classList.contains("active")) return;
+
+		if (event.key === "Escape") {
+			closeModal();
+		}
+
+		if (event.key === "ArrowRight") {
+			nextBtn?.click();
+		}
+
+		if (event.key === "ArrowLeft") {
+			prevBtn?.click();
+		}
+	});
+});
+</script>
+{% endblock %}
