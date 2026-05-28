@@ -63,6 +63,7 @@ INSTALLED_APPS = [
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'cs2pedia.apps.Cs2PediaConfig',
+	'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
