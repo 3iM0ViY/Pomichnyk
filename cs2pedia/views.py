@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView,
 from django.db.models import F
 
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 from django.contrib.auth import login
@@ -176,8 +176,8 @@ class CreatorDashboardView(LoginRequiredMixin, TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
-		strategies = self.request.user.creator_strategies.select_related("mapa").all().order_by("-likes", "-created_at")
-		lineups = self.request.user.creator_lineups.select_related("mapa").all().order_by("-likes", "-created_at")
+		strategies = self.request.user.creator_strategies.select_related("mapa").prefetch_related("slide").all().order_by("-likes", "-created_at")
+		lineups = self.request.user.creator_lineups.select_related("mapa").prefetch_related("slide").all().order_by("-likes", "-created_at")
 		
 		context.update({
 			"strategies": strategies,
@@ -291,8 +291,10 @@ class StrategyUpdateView(CreatorOnlyMixin, UpdateView):
 
 class StrategyDeleteView(CreatorOnlyMixin, DeleteView):
 	model = Strategy
-	template_name = "creator/strategy_confirm_delete.html"
 	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
+
+	def get(self, request, *args, **kwargs):
+		return redirect("pomichnyk_core:creator_dashboard")
 
 # User made lineups
 class LineupCreateView(LoginRequiredMixin, CreateView):
@@ -392,5 +394,7 @@ class LineupUpdateView(CreatorOnlyMixin, UpdateView):
 
 class LineupDeleteView(CreatorOnlyMixin, DeleteView):
 	model = Lineup
-	template_name = "creator/lineup_confirm_delete.html"
 	success_url = reverse_lazy("pomichnyk_core:creator_dashboard")
+
+	def get(self, request, *args, **kwargs):
+		return redirect("pomichnyk_core:creator_dashboard")
