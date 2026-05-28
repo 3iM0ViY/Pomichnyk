@@ -411,6 +411,18 @@ p{
 	backdrop-filter: blur(12px);
 	text-align: right;
 }
+
+.celebration{
+	display: flex;
+	justify-content: center; 
+	align-items: end; 
+	line-height: 1em;
+}
+@media (max-width: 1530px){
+	.lower-main{
+		display: none;
+	}
+}
 /* ===================== 
 	Responsive 
 ===================== */
@@ -447,6 +459,9 @@ p{
 	}
 	.logo-text{
 		font-size: 1.2rem;
+	}
+	.dash-bg{
+		opacity: 0.75;
 	}
 }
 /* ===================== 
@@ -513,7 +528,7 @@ p{
 		gap:0.9rem;
 	}
 	.map-card{
-		aspect-ratio:16/9;
+		aspect-ratio:2.76/1;
 		padding:1.25rem;
 		border-radius:14px;
 	}
