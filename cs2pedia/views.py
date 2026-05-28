@@ -174,8 +174,8 @@ class CreatorDashboardView(LoginRequiredMixin, TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
-		strategies = self.request.user.creator_strategies.select_related("mapa").all()
-		lineups = self.request.user.creator_lineups.select_related("mapa").all()
+		strategies = self.request.user.creator_strategies.select_related("mapa").all().order_by("-likes", "-created_at")
+		lineups = self.request.user.creator_lineups.select_related("mapa").all().order_by("-likes", "-created_at")
 		
 		context.update({
 			"strategies": strategies,

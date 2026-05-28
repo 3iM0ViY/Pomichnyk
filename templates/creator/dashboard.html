@@ -5,10 +5,13 @@
 {% block content %}
 <section class="creator-dashboard">
 	<header class="creator-hero">
-		<div>
+		<div class="creator-hero-content">
 			<p class="eyebrow">Кабінет автора</p>
 			<h1>{{ user.username }}</h1>
-			<p>Тут можна створювати й редагувати власні страти та лайнапи.</p>
+			<p>
+				Тут можна створювати й редагувати власні страти та лайнапи.
+				Розвлікайтесь.
+			</p>
 		</div>
 
 		<div class="creator-actions">
@@ -17,47 +20,111 @@
 		</div>
 	</header>
 
+	<div class="creator-stats">
+		<div class="creator-stat-card">
+			<span class="stat-value">{{ strategies|length }}</span>
+			<span class="stat-label">страт</span>
+		</div>
+
+		<div class="creator-stat-card">
+			<span class="stat-value">{{ lineups|length }}</span>
+			<span class="stat-label">лайнапів</span>
+		</div>
+
+		<div class="creator-stat-card">
+			<span class="stat-value">{{ user.date_joined|date:"d.m.Y" }}</span>
+			<span class="stat-label">дата реєстрації</span>
+		</div>
+	</div>
+
 	<section class="creator-section">
-		<h2>Мої страти</h2>
+		<div class="creator-section-header">
+			<div>
+				<p class="eyebrow">Strategies</p>
+				<h2>Мої страти</h2>
+			</div>
+
+			<a href="{% url 'pomichnyk_core:strategy_create' %}" class="section-action">Додати страту</a>
+		</div>
 
 		<div class="creator-list">
 			{% for strat in strategies %}
 				<article class="creator-item">
-					<div>
-						<h3>{{ strat.name }}</h3>
-						<p>{{ strat.mapa.name }} · {{ strat.side }} · {{ strat.likes }} вподобань</p>
+					<div class="creator-item-main">
+						<div class="creator-item-icon side-{{ strat.side|lower }}">
+							{{ strat.side }}
+						</div>
+
+						<div>
+							<h3>{{ strat.name }}</h3>
+							<p>
+								{{ strat.mapa.name }}
+								<span>·</span>
+								{{ strat.side }}
+								<span>·</span>
+								{{ strat.likes }} вподобань
+							</p>
+						</div>
 					</div>
 
 					<div class="item-actions">
 						<a href="{{ strat.get_absolute_url }}">Переглянути</a>
 						<a href="{% url 'pomichnyk_core:strategy_update' strat.slug %}">Редагувати</a>
-						<a href="{% url 'pomichnyk_core:strategy_delete' strat.slug %}">Видалити</a>
+						<a href="{% url 'pomichnyk_core:strategy_delete' strat.slug %}" class="danger-link">Видалити</a>
 					</div>
 				</article>
 			{% empty %}
-				<p>Ти ще не створив жодної страти.</p>
+				<div class="creator-empty">
+					<h3>Страт ще немає</h3>
+					<p>Створи першу страту — і вона зʼявиться тут.</p>
+					<a href="{% url 'pomichnyk_core:strategy_create' %}" class="btn-primary">+ Нова страта</a>
+				</div>
 			{% endfor %}
 		</div>
 	</section>
 
 	<section class="creator-section">
-		<h2>Мої лайнапи</h2>
+		<div class="creator-section-header">
+			<div>
+				<p class="eyebrow">Lineups</p>
+				<h2>Мої лайнапи</h2>
+			</div>
+
+			<a href="{% url 'pomichnyk_core:lineup_create' %}" class="section-action">Додати лайнап</a>
+		</div>
 
 		<div class="creator-list">
 			{% for lineup in lineups %}
 				<article class="creator-item">
-					<div>
-						<h3>{{ lineup.title }}</h3>
-						<p>{{ lineup.mapa.name }} · {{ lineup.get_utility_display }} · {{ lineup.likes }} вподобань</p>
+					<div class="creator-item-main">
+						<div class="creator-item-icon utility-{{ lineup.utility }}">
+							{{ lineup.get_utility_display|slice:":1" }}
+						</div>
+
+						<div>
+							<h3>{{ lineup.title }}</h3>
+							<p>
+								{{ lineup.mapa.name }}
+								<span>·</span>
+								{{ lineup.get_utility_display }}
+								<span>·</span>
+								{{ lineup.likes }} вподобань
+							</p>
+						</div>
 					</div>
 
 					<div class="item-actions">
+						<a href="{{ lineup.mapa.get_absolute_url }}#{{ lineup.pk }}">Переглянути</a>
 						<a href="{% url 'pomichnyk_core:lineup_update' lineup.pk %}">Редагувати</a>
-						<a href="{% url 'pomichnyk_core:lineup_delete' lineup.pk %}">Видалити</a>
+						<a href="{% url 'pomichnyk_core:lineup_delete' lineup.pk %}" class="danger-link">Видалити</a>
 					</div>
 				</article>
 			{% empty %}
-				<p>Ти ще не створив жодного лайнапу.</p>
+				<div class="creator-empty">
+					<h3>Лайнапів ще немає</h3>
+					<p>Додай перший smoke, molotov або flash — і він зʼявиться тут.</p>
+					<a href="{% url 'pomichnyk_core:lineup_create' %}" class="btn-primary">+ Новий лайнап</a>
+				</div>
 			{% endfor %}
 		</div>
 	</section>
