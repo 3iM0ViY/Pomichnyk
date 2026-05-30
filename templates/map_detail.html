@@ -102,6 +102,12 @@
 								{% for img in lineup.slide.all|dictsort:"created_at" %}
 									<div class="lineup-slide">
 										<img src="{{ img.img.url }}" alt="{{ img.alt_text }}">
+
+										{% if img.comment %}
+											<div class="lineup-img-comment">
+												<span>{{ img.comment }}</span>
+											</div>
+										{% endif %}
 									</div>
 								{% empty %}
 									<div class="placeholder">
