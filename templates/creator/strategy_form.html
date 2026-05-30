@@ -67,6 +67,8 @@
 				<div class="inline-upload-row inline-upload-head">
 					<span>Зображення</span>
 					<span>Підпис</span>
+					<span>Альт атрибут</span>
+					<span>Коментар</span>
 					<span></span>
 				</div>
 
@@ -86,9 +88,25 @@
 							</div>
 
 							<div class="form-group">
+								{{ image_form.name }}
+
+								{% for error in image_form.name.errors %}
+									<p class="field-error">{{ error }}</p>
+								{% endfor %}
+							</div>
+
+							<div class="form-group">
 								{{ image_form.alt_text }}
 
 								{% for error in image_form.alt_text.errors %}
+									<p class="field-error">{{ error }}</p>
+								{% endfor %}
+							</div>
+
+							<div class="form-group">
+								{{ image_form.comment }}
+
+								{% for error in image_form.comment.errors %}
 									<p class="field-error">{{ error }}</p>
 								{% endfor %}
 							</div>
