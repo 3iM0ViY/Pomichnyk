@@ -40,12 +40,12 @@ class LineupForm(forms.ModelForm):
 class StratImgUploadForm(forms.ModelForm):
 	class Meta:
 		model = StratImg
-		fields = ["img", "alt_text"]
+		fields = ["img", "name", "alt_text", "comment",]
 
 class LineupImgUploadForm(forms.ModelForm):
 	class Meta:
 		model = LineupImg
-		fields = ["img", "alt_text"]
+		fields = ["img", "name", "alt_text", "comment",]
 
 StratImgUploadFormSet = modelformset_factory(
 	StratImg,

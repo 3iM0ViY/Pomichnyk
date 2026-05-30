@@ -2363,7 +2363,7 @@ Strategy detail
 }
 .inline-upload-row {
 	display: grid;
-	grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) 44px;
+	grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) minmax(220px, 1fr) minmax(220px, 1fr) 44px;
 	gap: 1rem;
 	align-items: start;
 	padding: 1rem;

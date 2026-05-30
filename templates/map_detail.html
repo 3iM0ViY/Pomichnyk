@@ -101,7 +101,7 @@
 							<div class="lineup-track">
 								{% for img in lineup.slide.all|dictsort:"created_at" %}
 									<div class="lineup-slide">
-										<img src="{{ img.img.url }}" alt="{{ lineup.title }}">
+										<img src="{{ img.img.url }}" alt="{{ img.alt_text }}">
 									</div>
 								{% empty %}
 									<div class="placeholder">

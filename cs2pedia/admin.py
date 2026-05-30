@@ -89,16 +89,18 @@ class MapAdmin(admin.ModelAdmin):
 	get_photo.short_description = "Зображення"
 
 class StratImgAdmin(admin.ModelAdmin):
-	list_display = ("id", "alt_text", "get_photo", "created_at")
+	list_display = ("id", "name", "alt_text", "comment", "get_photo", "created_at")
 	list_display_links = ("id",)
-	list_editable = ("alt_text",)
-	search_fields = ("alt_text",)
+	list_editable = ("name", "alt_text", "comment",)
+	search_fields = ("name", "alt_text", "comment",)
 	readonly_fields = ("get_photo", "created_at",)
-	fields = ("img", "img_mini", "alt_text", "get_photo", "created_at",)
+	fields = ("img", "img_mini", "name", "alt_text", "comment", "get_photo", "created_at",)
 
 	def get_photo(self, obj):
 		if obj.img_mini:
 			return mark_safe(f'<img src="{obj.img_mini.url}" width="50">') # об'єкт це посилання на модель з фотографією
+		elif obj.img:
+			return mark_safe(f'<img src="{obj.img.url}" width="50">')
 		return "-"
 
 	get_photo.short_description = "Зображення"
@@ -117,6 +119,8 @@ class StratImgInline(admin.TabularInline):
 		img = getattr(obj, "stratimg", None)
 		if img and img.img_mini:
 			return mark_safe(f'<img src="{img.img_mini.url}" width="50">') # об'єкт це посилання на модель з фотографією
+		elif img and img.img:
+			return mark_safe(f'<img src="{img.img.url}" width="50">')
 		return "-"
 
 	get_photo.short_description = "Зображення"
@@ -161,16 +165,18 @@ class StrategyAdmin(admin.ModelAdmin):
 		super().save_model(request, obj, form, change)
 
 class LineupImgAdmin(admin.ModelAdmin):
-	list_display = ("id", "alt_text", "get_photo", "created_at")
+	list_display = ("id", "name", "alt_text", "comment", "get_photo", "created_at")
 	list_display_links = ("id",)
-	list_editable = ("alt_text",)
-	search_fields = ("alt_text",)
+	list_editable = ("name", "alt_text", "comment",)
+	search_fields = ("name", "alt_text", "comment",)
 	readonly_fields = ("get_photo", "created_at",)
-	fields = ("img", "img_mini", "alt_text", "get_photo", "created_at",)
+	fields = ("img", "img_mini", "name", "alt_text", "comment", "get_photo", "created_at",)
 
 	def get_photo(self, obj):
 		if obj.img_mini:
 			return mark_safe(f'<img src="{obj.img_mini.url}" width="50">') # об'єкт це посилання на модель з фотографією
+		elif obj.img:
+			return mark_safe(f'<img src="{obj.img.url}" width="50">')
 		return "-"
 
 	get_photo.short_description = "Зображення"
@@ -188,6 +194,8 @@ class LineupImgInline(admin.TabularInline):
 		img = getattr(obj, "lineupimg", None)
 		if img and img.img_mini:
 			return mark_safe(f'<img src="{img.img_mini.url}" width="50">') # об'єкт це посилання на модель з фотографією
+		elif img and img.img:
+			return mark_safe(f'<img src="{img.img.url}" width="50">')
 		return "-"
 
 	get_photo.short_description = "Зображення"

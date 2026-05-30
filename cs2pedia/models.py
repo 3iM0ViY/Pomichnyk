@@ -2,8 +2,42 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django_ckeditor_5.fields import CKEditor5Field
+from django.utils.text import slugify
+import os
+from django.utils.deconstruct import deconstructible
+from django.core.files.base import ContentFile
 
 # Create your models here.
+
+def clean_image_name(instance, filename):
+	original_name, ext = os.path.splitext(filename)
+	ext = ext.lower()
+
+	if instance.name:
+		base_name = slugify(instance.name, allow_unicode=True).replace("-", "_")
+	else:
+		base_name = slugify(original_name, allow_unicode=True).replace("-", "_")
+
+	return base_name, ext
+
+@deconstructible
+class ImageUploadTo:
+	def __init__(self, path, suffix=""):
+		self.path = path.rstrip("/")
+		self.suffix = suffix
+
+	def __call__(self, instance, filename):
+		base_name, ext = clean_image_name(instance, filename)
+		return f"{self.path}/{base_name}{self.suffix}{ext}"
+
+def build_renamed_image_path(old_path, new_name, suffix=""):
+	directory = os.path.dirname(old_path)
+	_, ext = os.path.splitext(old_path)
+
+	base_name = slugify(new_name, allow_unicode=True).replace("-", "_")
+
+	return f"{directory}/{base_name}{suffix}{ext.lower()}"
+
 
 class Map(models.Model):
 	name = models.CharField(verbose_name='Назва', max_length=100)
@@ -34,9 +68,11 @@ class Map(models.Model):
 		return reverse('pomichnyk_core:map_detail', args=[self.slug,])
 
 class StratImg(models.Model):
-	img = models.ImageField(verbose_name='Зображення', upload_to="cs2pedia/strategies")
-	img_mini = models.ImageField(verbose_name='Стиснуте зображення', upload_to="cs2pedia/strategies/mini", null=True, blank=True)
-	alt_text = models.CharField(verbose_name="Підпис", max_length=250, null=True, blank=True)
+	img = models.ImageField(verbose_name='Зображення', upload_to=ImageUploadTo("cs2pedia/strategies"),)
+	img_mini = models.ImageField(verbose_name='Стиснуте зображення', upload_to=ImageUploadTo("cs2pedia/strategies/mini", suffix="_mini"), null=True, blank=True)
+	name = models.CharField(verbose_name="Назва", max_length=250, null=True, blank=True)
+	alt_text = models.CharField(verbose_name="Альт атрибут", max_length=250, null=True, blank=True)
+	comment = models.CharField(verbose_name="Підпис", max_length=250, null=True, blank=True)
 	created_at = models.DateTimeField(verbose_name='Створено', auto_now_add=True, null=True)
 
 	def __str__(self):
@@ -46,6 +82,52 @@ class StratImg(models.Model):
 		verbose_name = 'Зображення'
 		verbose_name_plural = 'Зображення'
 		ordering = ['-created_at']
+
+	def rename_file_field(self, field_name, suffix=""):
+		file_field = getattr(self, field_name)
+
+		if not file_field:
+			return
+
+		old_path = file_field.name
+		new_path = build_renamed_image_path(old_path, self.name, suffix=suffix)
+
+		if old_path == new_path:
+			return
+
+		storage = file_field.storage
+
+		if storage.exists(new_path):
+			# Optional but useful: avoid overwriting another file.
+			base, ext = os.path.splitext(new_path)
+			counter = 2
+
+			while storage.exists(f"{base}_{counter}{ext}"):
+				counter += 1
+
+			new_path = f"{base}_{counter}{ext}"
+
+		with storage.open(old_path, "rb") as old_file:
+			storage.save(new_path, ContentFile(old_file.read()))
+
+		storage.delete(old_path)
+		file_field.name = new_path
+
+	def save(self, *args, **kwargs):
+		name_changed = False
+
+		if self.pk:
+			old = type(self).objects.filter(pk=self.pk).only("name").first()
+			if old and old.name != self.name:
+				name_changed = True
+
+		super().save(*args, **kwargs)
+
+		if self.name and name_changed:
+			self.rename_file_field("img")
+			self.rename_file_field("img_mini", suffix="_mini")
+
+			super().save(update_fields=["img", "img_mini"])
 
 class Strategy(models.Model):
 	mapa = models.ForeignKey(Map, verbose_name="Мапа", on_delete=models.CASCADE, related_name="map_strategies")
@@ -72,9 +154,11 @@ class Strategy(models.Model):
 		return reverse('pomichnyk_core:strat_detail', args=[self.slug,])
 
 class LineupImg(models.Model):
-	img = models.ImageField(verbose_name='Зображення', upload_to="cs2pedia/lineups")
-	img_mini = models.ImageField(verbose_name='Стиснуте зображення', upload_to="cs2pedia/lineups/mini", null=True, blank=True)
-	alt_text = models.CharField(verbose_name="Підпис", max_length=250, null=True, blank=True)
+	img = models.ImageField(verbose_name='Зображення', upload_to=ImageUploadTo("cs2pedia/lineups"),)
+	img_mini = models.ImageField(verbose_name='Стиснуте зображення', upload_to=ImageUploadTo("cs2pedia/lineups/mini", suffix="_mini"), null=True, blank=True)
+	name = models.CharField(verbose_name="Назва", max_length=250, null=True, blank=True)
+	alt_text = models.CharField(verbose_name="Альт атрибут", max_length=250, null=True, blank=True)
+	comment = models.CharField(verbose_name="Підпис", max_length=250, null=True, blank=True)
 	created_at = models.DateTimeField(verbose_name='Створено', auto_now_add=True, null=True)
 
 	def __str__(self):
@@ -84,6 +168,52 @@ class LineupImg(models.Model):
 		verbose_name = 'Зображення'
 		verbose_name_plural = 'Зображення'
 		ordering = ['-created_at']
+
+	def rename_file_field(self, field_name, suffix=""):
+		file_field = getattr(self, field_name)
+
+		if not file_field:
+			return
+
+		old_path = file_field.name
+		new_path = build_renamed_image_path(old_path, self.name, suffix=suffix)
+
+		if old_path == new_path:
+			return
+
+		storage = file_field.storage
+
+		if storage.exists(new_path):
+			# Optional but useful: avoid overwriting another file.
+			base, ext = os.path.splitext(new_path)
+			counter = 2
+
+			while storage.exists(f"{base}_{counter}{ext}"):
+				counter += 1
+
+			new_path = f"{base}_{counter}{ext}"
+
+		with storage.open(old_path, "rb") as old_file:
+			storage.save(new_path, ContentFile(old_file.read()))
+
+		storage.delete(old_path)
+		file_field.name = new_path
+
+	def save(self, *args, **kwargs):
+		name_changed = False
+
+		if self.pk:
+			old = type(self).objects.filter(pk=self.pk).only("name").first()
+			if old and old.name != self.name:
+				name_changed = True
+
+		super().save(*args, **kwargs)
+
+		if self.name and name_changed:
+			self.rename_file_field("img")
+			self.rename_file_field("img_mini", suffix="_mini")
+
+			super().save(update_fields=["img", "img_mini"])
 
 class Lineup(models.Model):
 	mapa = models.ForeignKey(Map, verbose_name="Мапа", on_delete=models.CASCADE, related_name="map_lineups")
