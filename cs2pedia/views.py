@@ -399,8 +399,19 @@ class LineupDeleteView(CreatorOnlyMixin, DeleteView):
 	def get(self, request, *args, **kwargs):
 		return redirect("pomichnyk_core:creator_dashboard")
 
+
+def normalise_search(value):
+	if value is None:
+		return ""
+	return str(value).casefold().strip()
+
+def includes_query(query, *values):
+	search_blob = " ".join(normalise_search(value) for value in values)
+	return query in search_blob
+
 def global_search(request):
-	query = request.GET.get("q", "").strip()
+	raw_query = request.GET.get("q", "")
+	query = normalise_search(raw_query)
 
 	if len(query) < 2:
 		return JsonResponse({
@@ -409,66 +420,60 @@ def global_search(request):
 
 	results = []
 
-	maps = (
-		Map.objects.filter(
-			Q(name__icontains=query) |
-			Q(meta__icontains=query) |
-			Q(keywords__icontains=query),
-			is_published=True,
-		).order_by("name")[:5]
-	)
+	maps = (Map.objects.filter(is_published=True).order_by("name"))
 
 	for mapa in maps:
-		results.append({
-			"type": "map",
-			"utility_type": "map", #not a util placeholder
-			"title": mapa.name,
-			"subtitle": mapa.meta or "Мапа",
-			"url": mapa.get_absolute_url(),
-		})
+		if includes_query(query, mapa.name, mapa.meta, mapa.keywords,):
+			results.append({
+				"type": "map",
+				"utility_type": "map", #not a util placeholder
+				"title": mapa.name,
+				# "subtitle": mapa.meta or "Мапа",
+				"url": mapa.get_absolute_url(),
+			})
 
 	strategies = (
 		Strategy.objects.filter(
-			Q(name__icontains=query) |
-			Q(description__icontains=query) |
-			Q(mapa__name__icontains=query) |
-			Q(created_by__username__icontains=query),
 			is_active=True,
 			mapa__is_published=True,
-		).select_related("mapa", "created_by").order_by("-likes", "-created_at")[:7]
+		).select_related("mapa", "created_by").order_by("-likes", "-created_at")
 	)
 
 	for strategy in strategies:
-		results.append({
-			"type": "strategy",
-			"utility_type": "strategy", #not a util placeholder
-			"title": strategy.name,
-			"subtitle": f"Страта · {strategy.mapa.name} · автор: {strategy.created_by}",
-			"url": strategy.get_absolute_url(),
-		})
+		if includes_query(query, strategy.name, strategy.description, strategy.mapa.name, strategy.created_by.username if strategy.created_by else "",):
+			results.append({
+				"type": "strategy",
+				"utility_type": "strategy", #not a util placeholder
+				"title": strategy.name,
+				"subtitle": f"{strategy.mapa.name} · {strategy.side} · автор: {strategy.created_by}",
+				"url": strategy.get_absolute_url(),
+			})
 
 	lineups = (
 		Lineup.objects.filter(
-			Q(title__icontains=query) |
-			Q(description__icontains=query) |
-			Q(comment__icontains=query) |
-			Q(throw_from__icontains=query) |
-			Q(land_at__icontains=query) |
-			Q(mapa__name__icontains=query) |
-			Q(created_by__username__icontains=query),
 			is_published=True,
 			mapa__is_published=True,
-		).select_related("mapa", "created_by").order_by("-likes", "-created_at")[:8]
+		).select_related("mapa", "created_by").order_by("-likes", "-created_at")
 	)
 
 	for lineup in lineups:
-		results.append({
-			"type": "lineup",
-			"utility_type": lineup.utility,
-			"title": lineup.title,
-			"subtitle": f"{lineup.mapa.name} · {lineup.throw_from} → {lineup.land_at} · автор: {lineup.created_by}",
-			"url": f"{lineup.mapa.get_absolute_url()}#{lineup.pk}",
-		})
+		if includes_query(
+			query,
+			lineup.title,
+			lineup.description,
+			lineup.comment,
+			lineup.throw_from,
+			lineup.land_at,
+			lineup.mapa.name,
+			lineup.created_by.username if lineup.created_by else "",
+		):
+			results.append({
+				"type": "lineup",
+				"utility_type": lineup.utility,
+				"title": lineup.title,
+				"subtitle": f"{lineup.mapa.name} · {lineup.throw_from} → {lineup.land_at} · автор: {lineup.created_by}",
+				"url": f"{lineup.mapa.get_absolute_url()}#{lineup.pk}",
+			})
 
 	return JsonResponse({
 		"results": results[:15]
