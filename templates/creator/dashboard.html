@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Кабінет автора | Pomichnyk{% endblock %}
 
@@ -68,8 +69,8 @@
 					</div>
 
 					<div class="item-actions">
-						<a href="{{ strat.get_absolute_url }}">Переглянути</a>
-						<a href="{% url 'pomichnyk_core:strategy_update' strat.slug %}">Редагувати</a>
+						<a href="{{ strat.get_absolute_url }}"><img src="{% static 'static_img/icons/watch.svg' %}" alt=""></a>
+						<a href="{% url 'pomichnyk_core:strategy_update' strat.slug %}"><img src="{% static 'static_img/icons/edit.svg' %}" alt=""></a>
 						<button
 							type="button"
 							class="danger-link delete-trigger"
@@ -80,7 +81,7 @@
 							data-delete-preview-url="{{ strat.get_absolute_url }}"
 							data-delete-template="delete-images-strat-{{ strat.pk }}"
 						>
-							Видалити
+							<img src="{% static 'static_img/icons/trash.svg' %}" alt="">
 						</button>
 
 						<template id="delete-images-strat-{{ strat.pk }}">
@@ -137,8 +138,8 @@
 					</div>
 
 					<div class="item-actions">
-						<a href="{{ lineup.mapa.get_absolute_url }}#{{ lineup.pk }}">Переглянути</a>
-						<a href="{% url 'pomichnyk_core:lineup_update' lineup.pk %}">Редагувати</a>
+						<a href="{{ lineup.mapa.get_absolute_url }}#{{ lineup.pk }}"><img src="{% static 'static_img/icons/watch.svg' %}" alt=""></a>
+						<a href="{% url 'pomichnyk_core:lineup_update' lineup.pk %}"><img src="{% static 'static_img/icons/edit.svg' %}" alt=""></a>
 						<button
 							type="button"
 							class="danger-link delete-trigger"
@@ -149,7 +150,7 @@
 							data-delete-preview-url="{{ lineup.mapa.get_absolute_url }}#{{ lineup.pk }}"
 							data-delete-template="delete-images-lineup-{{ lineup.pk }}"
 						>
-							Видалити
+							<img src="{% static 'static_img/icons/trash.svg' %}" alt="">
 						</button>
 
 						<template id="delete-images-lineup-{{ lineup.pk }}">

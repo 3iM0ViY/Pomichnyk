@@ -10,7 +10,8 @@ urlpatterns = [
 	path("lineups/<int:pk>/vote/", lineup_vote, name="lineup_vote"),
 	path("strats/<slug:slug>/", StratDetailView.as_view(), name="strat_detail"),
 	path("strats/<int:pk>/vote/", strategy_vote, name="strategy_vote"),
-
+	path("search/", global_search, name="global_search"),
+	
 	path("register/", RegisterView.as_view(), name="register"),
 	path("creator/", CreatorDashboardView.as_view(), name="creator_dashboard"),
 
