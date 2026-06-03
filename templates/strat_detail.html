@@ -49,7 +49,7 @@
 			<aside class="strat-images">
 				{% for img in strat.slide.all %}
 					<figure class="strat-image-card lineup-slide">
-						<img src="{% if img.img_mini %}{{ img.img_mini.url }}{% else %}{{ img.img.url }}{% endif %}" alt="{{ img.alt_text|default:strat.name }}">
+						<img src="{% if img.img_mini %}{{ img.img_mini.url }}{% else %}{{ img.img.url }}{% endif %}" loading="lazy" alt="{{ img.alt_text|default:strat.name }}">
 
 						{% if img.comment %}
 							<div class="lineup-img-comment">
