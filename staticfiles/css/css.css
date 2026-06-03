@@ -1788,6 +1788,7 @@ Strategy detail
 .creator-list {
 	display: grid;
 	gap: 0.8rem;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 .creator-item {
 	display: grid;
@@ -1928,6 +1929,11 @@ Strategy detail
 	width: auto;
 	min-width: 190px;
 }
+@media (max-width: 1600px){
+	.creator-list{
+		grid-template-columns: none;
+	}
+}
 @media (max-width: 900px) {
 	.creator-hero {
 		grid-template-columns: 1fr;
@@ -1972,11 +1978,15 @@ Strategy detail
 	}
 	.item-actions {
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+        grid-auto-flow: column;
 	}
 	.item-actions a {
 		width: 100%;
 		box-sizing: border-box;
+	}
+	.item-actions img{
+		width: 40%;
 	}
 	.creator-empty .btn-primary {
 		width: 100%;
