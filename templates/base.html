@@ -16,6 +16,12 @@
 				<a href="{% url 'pomichnyk_core:home' %}" class="logo-text" data-text="Pomichnyk">Pomichnyk</a>
 			</div>
 
+			<div class="global-search" data-search-url="{% url 'pomichnyk_core:global_search' %}">
+				<input type="search" class="global-search-input" placeholder="Глобальний пошук..." autocomplete="off" aria-label="Глобальний пошук">
+
+				<div class="global-search-results" aria-live="polite"></div>
+			</div>
+
 			<button class="nav-toggle" aria-label="Toggle navigation">
 				<span></span>
 				<span></span>
@@ -117,6 +123,138 @@
 	toggle.addEventListener("click", () => {
 		menu.classList.toggle("active");
 		toggle.classList.toggle("active");
+	});
+</script>
+
+<script>
+	const globalSearch = document.querySelector(".global-search");
+	const globalSearchInput = document.querySelector(".global-search-input");
+	const globalSearchResults = document.querySelector(".global-search-results");
+
+	let globalSearchTimeout = null;
+	let selectedGlobalSearchIndex = -1;
+
+	function getResultTypeLabel(type) {
+		const labels = {
+			map: "Мапа",
+			strategy: "Страта",
+			lineup: "Лайнап",
+		};
+
+		return labels[type] || "Результат";
+	}
+
+	function closeGlobalSearchResults() {
+		globalSearchResults?.classList.remove("active");
+		selectedGlobalSearchIndex = -1;
+	}
+
+	function renderGlobalSearchResults(results) {
+		if (!globalSearchResults) return;
+
+		selectedGlobalSearchIndex = -1;
+
+		if (!results.length) {
+			globalSearchResults.innerHTML = `
+				<div class="global-search-empty">
+					Нічого не знайдено.
+				</div>
+			`;
+			globalSearchResults.classList.add("active");
+			return;
+		}
+
+		globalSearchResults.innerHTML = results.map(result => `
+			<a href="${result.url}" class="global-search-result lineup-${result.utility_type}">
+				<div class="global-search-result-title">
+					<span class="global-search-result-type">${getResultTypeLabel(result.type)}</span>
+					<span>${result.title}</span>
+				</div>
+				<div class="global-search-result-subtitle">
+					${result.subtitle || ""}
+				</div>
+			</a>
+		`).join("");
+
+		globalSearchResults.classList.add("active");
+	}
+
+	async function runGlobalSearch() {
+		if (!globalSearch || !globalSearchInput) return;
+
+		const query = globalSearchInput.value.trim();
+		const searchUrl = globalSearch.dataset.searchUrl;
+
+		if (query.length < 2) {
+			closeGlobalSearchResults();
+			return;
+		}
+
+		const response = await fetch(`${searchUrl}?q=${encodeURIComponent(query)}`);
+
+		if (!response.ok) {
+			closeGlobalSearchResults();
+			return;
+		}
+
+		const data = await response.json();
+
+		renderGlobalSearchResults(data.results || []);
+	}
+
+	globalSearchInput?.addEventListener("input", () => {
+		clearTimeout(globalSearchTimeout);
+
+		globalSearchTimeout = setTimeout(() => {
+			runGlobalSearch();
+		}, 180);
+	});
+
+	globalSearchInput?.addEventListener("keydown", event => {
+		const results = [...document.querySelectorAll(".global-search-result")];
+
+		if (!results.length) return;
+
+		if (event.key === "ArrowDown") {
+			event.preventDefault();
+
+			selectedGlobalSearchIndex =
+				selectedGlobalSearchIndex < results.length - 1
+					? selectedGlobalSearchIndex + 1
+					: 0;
+		}
+
+		if (event.key === "ArrowUp") {
+			event.preventDefault();
+
+			selectedGlobalSearchIndex =
+				selectedGlobalSearchIndex > 0
+					? selectedGlobalSearchIndex - 1
+					: results.length - 1;
+		}
+
+		if (event.key === "Enter" && selectedGlobalSearchIndex >= 0) {
+			event.preventDefault();
+			results[selectedGlobalSearchIndex].click();
+			return;
+		}
+
+		results.forEach((result, index) => {
+			result.classList.toggle("is-selected", index === selectedGlobalSearchIndex);
+		});
+	});
+
+	document.addEventListener("click", event => {
+		if (!event.target.closest(".global-search")) {
+			closeGlobalSearchResults();
+		}
+	});
+
+	document.addEventListener("keydown", event => {
+		if (event.key === "Escape") {
+			closeGlobalSearchResults();
+			globalSearchInput?.blur();
+		}
 	});
 </script>
 {% block scripts %}
