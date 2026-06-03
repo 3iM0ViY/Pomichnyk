@@ -72,25 +72,31 @@
 		<div class="lineups-header">
 			<h2>Лайнапи гранат</h2>
 
-			<div class="lineup-filters" aria-label="Фільтр гранат">
-				<button class="lineup-filter active" type="button" data-filter="all" aria-label="Усі гранати">
-					<span>Усі</span>
-				</button>
-				<button class="lineup-filter" type="button" data-filter="smoke" aria-label="Смоки">
-					<img src="{% static 'static_img/icons/smokegrenade.svg' %}" alt="">
-				</button>
-				<button class="lineup-filter" type="button" data-filter="molotov" aria-label="Моліки">
-					<img src="{% static 'static_img/icons/molotov.svg' %}" alt="">
-				</button>
-				<button class="lineup-filter" type="button" data-filter="flash" aria-label="Флешки">
-					<img src="{% static 'static_img/icons/flashbang.svg' %}" alt="">
-				</button>
-				<button class="lineup-filter" type="button" data-filter="he" aria-label="ХаЕ">
-					<img src="{% static 'static_img/icons/hegrenade.svg' %}" alt="">
-				</button>
-				<button class="lineup-filter" type="button" data-filter="decoy" aria-label="Декої">
-					<img src="{% static 'static_img/icons/decoy.svg' %}" alt="">
-				</button>
+			<div class="lineup-right">
+				<label class="lineup-search">
+					<input type="search" id="lineupSearch" placeholder="Пошук лайнапів..." autocomplete="off" aria-label="Пошук лайнапів">
+				</label>
+				
+				<div class="lineup-filters" aria-label="Фільтр гранат">
+					<button class="lineup-filter active" type="button" data-filter="all" aria-label="Усі гранати">
+						<span>Усі</span>
+					</button>
+					<button class="lineup-filter" type="button" data-filter="smoke" aria-label="Смоки">
+						<img src="{% static 'static_img/icons/smokegrenade.svg' %}" alt="">
+					</button>
+					<button class="lineup-filter" type="button" data-filter="molotov" aria-label="Моліки">
+						<img src="{% static 'static_img/icons/molotov.svg' %}" alt="">
+					</button>
+					<button class="lineup-filter" type="button" data-filter="flash" aria-label="Флешки">
+						<img src="{% static 'static_img/icons/flashbang.svg' %}" alt="">
+					</button>
+					<button class="lineup-filter" type="button" data-filter="he" aria-label="ХаЕ">
+						<img src="{% static 'static_img/icons/hegrenade.svg' %}" alt="">
+					</button>
+					<button class="lineup-filter" type="button" data-filter="decoy" aria-label="Декої">
+						<img src="{% static 'static_img/icons/decoy.svg' %}" alt="">
+					</button>
+				</div>
 			</div>
 		</div>
 		<div class="lineups-grid">
@@ -182,6 +188,9 @@
 				<p class="muted">Додайте свою першу гранатку.</p>
 			{% endfor %}
 		</div>
+		<p class="muted lineups-empty-message is-hidden">
+			Нічого не знайдено.
+		</p>
 	</section>
 
 	<div class="lineup-modal" id="lineupModal" aria-hidden="true">
@@ -200,27 +209,61 @@
 
 {% block scripts %}
 <script>
-	document.querySelectorAll(".lineup-filter").forEach(filterBtn => {
-		filterBtn.addEventListener("click", () => {
-			const filter = filterBtn.dataset.filter;
+	const lineupFilters = document.querySelectorAll(".lineup-filter");
+	const lineupSearch = document.querySelector("#lineupSearch");
+	const lineupCards = document.querySelectorAll(".lineups-grid > .lineup-card");
+	const lineupsEmptyMessage = document.querySelector(".lineups-empty-message");
 
-			document.querySelectorAll(".lineup-filter").forEach(btn => {
+	let activeLineupFilter = "all";
+
+	function normaliseSearchText(value) {
+		return value.toLowerCase().trim().replace(/\s+/g, " ");
+	}
+
+	function getLineupSearchText(card) {
+		return normaliseSearchText(card.innerText || "");
+	}
+
+	function applyLineupFilters() {
+		const query = normaliseSearchText(lineupSearch?.value || "");
+		let visibleCount = 0;
+
+		lineupCards.forEach(card => {
+			const matchesUtility =
+				activeLineupFilter === "all" ||
+				card.classList.contains(`lineup-${activeLineupFilter}`);
+
+			const matchesSearch =
+				query === "" ||
+				getLineupSearchText(card).includes(query);
+
+			const shouldShow = matchesUtility && matchesSearch;
+
+			card.classList.toggle("is-hidden", !shouldShow);
+
+			if (shouldShow) {
+				visibleCount++;
+			}
+		});
+
+		lineupsEmptyMessage?.classList.toggle("is-hidden", visibleCount !== 0);
+	}
+
+	lineupFilters.forEach(filterBtn => {
+		filterBtn.addEventListener("click", () => {
+			activeLineupFilter = filterBtn.dataset.filter;
+
+			lineupFilters.forEach(btn => {
 				btn.classList.remove("active");
 			});
 
 			filterBtn.classList.add("active");
 
-			document.querySelectorAll(".lineup-card").forEach(card => {
-				if (filter === "all") {
-					card.classList.remove("is-hidden");
-					return;
-				}
-				card.classList.toggle(
-					"is-hidden", !card.classList.contains(`lineup-${filter}`)
-				);
-			});
+			applyLineupFilters();
 		});
 	});
+
+	lineupSearch?.addEventListener("input", applyLineupFilters);
 </script>
 <script>
 	function getCookie(name) {
