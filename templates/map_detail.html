@@ -2,6 +2,33 @@
 {% load static %}
 
 {% block title %}{{ map.name }}{% endblock %}
+{% block meta_description %}{{ map.meta }}{% endblock %}
+{% block meta_keywords %} {{ map.name }}, {{ map.name }} CS2, CS2 {{ map.name }} лайнапи, {{ map.name }} смоки, {{ map.name }} флешки, {{ map.name }} моліки, Counter-Strike 2, стратегії{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ map.name }} CS2 Лайнапи & Стратегії | Pomichnyk{% endblock %}
+{% block og_description %}{{ map.meta }}{% endblock %}
+{% block og_image %}
+	{% if map.img_mini %}
+		{{ request.scheme }}://{{ request.get_host }}{{ map.img_mini.url }}
+	{% elif map.image %}
+		{{ request.scheme }}://{{ request.get_host }}{{ map.image.url }}
+	{% else %}
+		{% static 'favicon.ico' %}
+	{% endif %}
+{% endblock %}
+
+{% block twitter_title %}{{ map.name }} CS2 Лайнапи & Стратегії | Pomichnyk{% endblock %}
+{% block twitter_description %}{{ map.meta }}{% endblock %}
+{% block twitter_image %}
+	{% if map.img_mini %}
+		{{ request.scheme }}://{{ request.get_host }}{{ map.img_mini.url }}
+	{% elif map.image %}
+		{{ request.scheme }}://{{ request.get_host }}{{ map.image.url }}
+	{% else %}
+		{% static 'favicon.ico' %}
+	{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="map-detail">
@@ -437,5 +464,20 @@
 			closeLineupModal();
 		}
 	});
+</script>
+
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "Article",
+	"headline": "{{ map.name }} CS2 Лайнапи & Стратегії",
+	"description": "{{ map.meta }}.",
+	"url": "{{ request.build_absolute_uri }}",
+	"image": "{% if map.image %}{{ request.scheme }}://{{ request.get_host }}{{ map.image.url }}{% endif %}",
+	"publisher": {
+		"@type": "Organization",
+		"name": "Pomichnyk"
+	}
+}
 </script>
 {% endblock %}

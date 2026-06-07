@@ -38,7 +38,27 @@
 				<div class="form-group {% if field.name == 'description' or field.name == 'slide' %}form-group-full{% endif %}">
 					<label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
-					{{ field }}
+					{% if field.name == "slide" or field.name == "images" %}
+						<div class="media-picker" data-picker>
+							<div class="media-picker-top">
+								<button type="button" class="media-picker-toggle" data-picker-toggle>
+									Обрати з наявних
+								</button>
+
+								<div class="media-picker-selected" data-picker-selected>
+									<span class="media-picker-empty">Нічого не вибрано</span>
+								</div>
+							</div>
+
+							<div class="media-picker-panel" data-picker-panel hidden>
+								<div class="media-picker-options" data-picker-options>
+									{{ field }}
+								</div>
+							</div>
+						</div>
+					{% else %}
+						{{ field }}
+					{% endif %}
 
 					{% if field.help_text %}
 						<small>{{ field.help_text }}</small>
@@ -255,5 +275,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	updateRemoveButtons();
 });
+</script>
+
+<script>
+function initMediaPickers() {
+	const pickers = document.querySelectorAll("[data-picker]");
+
+	pickers.forEach((picker) => {
+		const toggle = picker.querySelector("[data-picker-toggle]");
+		const panel = picker.querySelector("[data-picker-panel]");
+		const selectedBox = picker.querySelector("[data-picker-selected]");
+		const optionsBox = picker.querySelector("[data-picker-options]");
+
+		if (!toggle || !panel || !selectedBox || !optionsBox) return;
+
+		const checkboxes = Array.from(
+			optionsBox.querySelectorAll('input[type="checkbox"]')
+		);
+
+		function getChoiceCards() {
+			return checkboxes.map((checkbox) => checkbox.closest("label")).filter(Boolean);
+		}
+
+		function getLabelText(checkbox) {
+			const label = checkbox.closest("label");
+			if (!label) return "";
+
+			return label.textContent.replace(/\s+/g, " ").trim();
+		}
+
+		function getImageUrl(checkbox) {
+			const label = checkbox.closest("label");
+			const img = label ? label.querySelector("img") : null;
+			return img ? img.src : "";
+		}
+
+		function updateSelected() {
+			selectedBox.innerHTML = "";
+
+			const selected = checkboxes.filter((checkbox) => checkbox.checked);
+
+			if (!selected.length) {
+				const empty = document.createElement("span");
+				empty.className = "media-picker-empty";
+				empty.textContent = "Нічого не вибрано";
+				selectedBox.appendChild(empty);
+				return;
+			}
+
+			selected.forEach((checkbox) => {
+				const text = getLabelText(checkbox);
+				const imageUrl = getImageUrl(checkbox);
+
+				const chip = document.createElement("span");
+				chip.className = "media-picker-chip";
+
+				if (imageUrl) {
+					const img = document.createElement("img");
+					img.src = imageUrl;
+					img.alt = text;
+					chip.appendChild(img);
+				}
+
+				const title = document.createElement("span");
+				title.textContent = text;
+				chip.appendChild(title);
+
+				const remove = document.createElement("button");
+				remove.type = "button";
+				remove.textContent = "×";
+				remove.setAttribute("aria-label", "Прибрати зображення");
+
+				remove.addEventListener("click", () => {
+					checkbox.checked = false;
+					checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+				});
+
+				chip.appendChild(remove);
+				selectedBox.appendChild(chip);
+			});
+		}
+
+		function updateLabelState() {
+			getChoiceCards().forEach((label) => {
+				const checkbox = label.querySelector('input[type="checkbox"]');
+				label.classList.toggle("is-selected", checkbox && checkbox.checked);
+			});
+		}
+
+		toggle.addEventListener("click", () => {
+			panel.hidden = !panel.hidden;
+		});
+
+		checkboxes.forEach((checkbox) => {
+			checkbox.addEventListener("change", () => {
+				updateSelected();
+				updateLabelState();
+			});
+		});
+
+		updateSelected();
+		updateLabelState();
+	});
+}
+
+document.addEventListener("DOMContentLoaded", initMediaPickers);
 </script>
 {% endblock %}

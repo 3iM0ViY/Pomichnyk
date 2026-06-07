@@ -133,6 +133,7 @@ class Strategy(models.Model):
 	mapa = models.ForeignKey(Map, verbose_name="Мапа", on_delete=models.CASCADE, related_name="map_strategies")
 	name = models.CharField(verbose_name="Назва", max_length=200)
 	slug = models.SlugField(verbose_name='Слаг', unique=True)
+	meta = models.CharField(verbose_name="Мета", max_length=250, blank=True, null=True)
 	side = models.CharField(verbose_name="Сторона", max_length=10, choices=[("T", "T"), ("CT", "CT")])
 	description = CKEditor5Field(verbose_name="Вміст", config_name='extends', blank=True)
 	slide = models.ManyToManyField(StratImg, blank=True, verbose_name="Зображення")

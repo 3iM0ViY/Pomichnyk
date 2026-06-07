@@ -1,8 +1,18 @@
 from django import forms
 from .models import *
 from django.forms import modelformset_factory
+from .widgets import ImageCheckboxSelectMultiple
 
 class StrategyForm(forms.ModelForm):
+	slide = forms.ModelMultipleChoiceField(
+		queryset=StratImg.objects.all(),
+		required=False,
+		widget=ImageCheckboxSelectMultiple(attrs={
+			"class": "media-picker-source",
+		}),
+		label="Зображення",
+	)
+
 	class Meta:
 		model = Strategy
 		fields = [
@@ -19,6 +29,15 @@ class StrategyForm(forms.ModelForm):
 		}
 
 class LineupForm(forms.ModelForm):
+	slide = forms.ModelMultipleChoiceField(
+		queryset=LineupImg.objects.all(),
+		required=False,
+		widget=ImageCheckboxSelectMultiple(attrs={
+			"class": "media-picker-source",
+		}),
+		label="Зображення",
+	)
+	
 	class Meta:
 		model = Lineup
 		fields = [
