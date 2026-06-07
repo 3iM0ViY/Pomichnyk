@@ -1,0 +1,14 @@
+<label class="image-choice-card{% if widget.selected %} is-selected{% endif %}">
+	<input
+		type="{{ widget.type }}"
+		name="{{ widget.name }}"
+		value="{{ widget.value|stringformat:'s' }}"
+		{% include "django/forms/widgets/attrs.html" %}
+	>
+
+	{% if widget.image_url %}
+		<img src="{{ widget.image_url }}" alt="{{ widget.image_label }}">
+	{% endif %}
+
+	<span>{{ widget.image_label }}</span>
+</label>
