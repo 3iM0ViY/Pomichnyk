@@ -7,6 +7,23 @@
 	<title>Pomichnyk :: {% block title %}Головна{% endblock %}</title>
 	<link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 	<link rel="stylesheet" href="{% static 'css/css.css' %}">
+
+	<meta name="description" content="{% block meta_description %}Pomichnyk — лайнапи, стратегії та гайди для CS2.{% endblock %}">
+	<meta name="keywords" content="{% block meta_keywords %}CS2, Counter-Strike 2, лайнапи, смоки, флешки, моліки, стратегії{% endblock %}">
+	<meta name="author" content="{% block meta_author %}Pomichnyk{% endblock %}">
+
+	<meta property="og:type" content="{% block og_type %}website{% endblock %}">
+	<meta property="og:title" content="{% block og_title %}Pomichnyk{% endblock %}">
+	<meta property="og:description" content="{% block og_description %}Pomichnyk — лайнапи, стратегії та гайди для CS2.{% endblock %}">
+	<meta property="og:url" content="{{ request.build_absolute_uri }}">
+	<meta property="og:image" content="{% block og_image %}{% static 'favicon.ico' %}{% endblock %}">
+
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="{% block twitter_title %}Pomichnyk{% endblock %}">
+	<meta name="twitter:description" content="{% block twitter_description %}Лайнапи, стратегії та гайди для CS2.{% endblock %}">
+	<meta name="twitter:image" content="{% block twitter_image %}{% static 'favicon.ico' %}{% endblock %}">
+
+	<link rel="canonical" href="{{ request.build_absolute_uri }}">
 </head>
 <body>
 

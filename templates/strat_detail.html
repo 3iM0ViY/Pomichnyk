@@ -2,6 +2,46 @@
 {% load static %}
 
 {% block title %}{{ strat.name }}{% endblock %}
+{% block meta_author %}{{ strat.created_by }}{% endblock %}
+{% block meta_description %}{{ strat.meta }}{% endblock %}
+{% block meta_keywords %} {{ strat.name }}, {{ strat.mapa.name }} стратегія, {{ strat.mapa.name }} {{ strat.side }} стратегія, CS2 {{ strat.mapa.name }}, Counter-Strike 2 страта, CS2 тактики{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ strat.name }} — {{ strat.mapa.name }} {{ strat.side }} стратегія{% endblock %}
+{% block og_description %}{{ map.meta }}{% endblock %}
+{% block og_image %}
+	{% with first_img=strat.images.first %}
+		{% if first_img.img_mini %}
+			{{ request.scheme }}://{{ request.get_host }}{{ first_img.img_mini.url }}
+		{% elif first_img.img %}
+			{{ request.scheme }}://{{ request.get_host }}{{ first_img.img.url }}
+		{% elif strat.mapa.img_mini %}
+			{{ request.scheme }}://{{ request.get_host }}{{ strat.mapa.img_mini.url }}
+		{% elif strat.mapa.image %}
+			{{ request.scheme }}://{{ request.get_host }}{{ strat.mapa.image.url }}
+		{% else %}
+			{% static 'favicon.ico' %}
+		{% endif %}
+	{% endwith %}
+{% endblock %}
+
+{% block twitter_title %}{{ strat.name }} — {{ strat.mapa.name }} {{ strat.side }} стратегія{% endblock %}
+{% block twitter_description %}{{ map.meta }}{% endblock %}
+{% block twitter_image %}
+	{% with first_img=strat.images.first %}
+		{% if first_img.img_mini %}
+			{{ request.scheme }}://{{ request.get_host }}{{ first_img.img_mini.url }}
+		{% elif first_img.img %}
+			{{ request.scheme }}://{{ request.get_host }}{{ first_img.img.url }}
+		{% elif strat.mapa.img_mini %}
+			{{ request.scheme }}://{{ request.get_host }}{{ strat.mapa.img_mini.url }}
+		{% elif strat.mapa.image %}
+			{{ request.scheme }}://{{ request.get_host }}{{ strat.mapa.image.url }}
+		{% else %}
+			{% static 'favicon.ico' %}
+		{% endif %}
+	{% endwith %}
+{% endblock %}
 
 {% block content %}
 <section class="strat-detail">
@@ -67,7 +107,9 @@
 	</section>
 
 </section>
+{% endblock %}
 
+{% block scripts %}
 <script>
 	function getCookie(name) {
 		const value = `; ${document.cookie}`;
@@ -131,5 +173,23 @@
 			}
 		});
 	});
+</script>
+
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "Article",
+	"headline": "{{ strat.name }} — {{ strat.mapa.name }} {{ strat.side }} Стратегія",
+	"description": "{{ strat.meta }}",
+	"url": "{{ request.build_absolute_uri }}",
+	"author": {
+		"@type": "Person",
+		"name": "{% if strat.created_by %}{{ strat.created_by.username }}{% else %}Pomichnyk{% endif %}"
+	},
+	"publisher": {
+		"@type": "Organization",
+		"name": "Pomichnyk"
+	}
+}
 </script>
 {% endblock %}
